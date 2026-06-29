@@ -105,6 +105,22 @@ The useful signal is that a capable model routes the surface perfectly: gpt-4.1 
 
 `tools/reliability-harness/agent_demo.py` closes the loop end to end: it sends a natural-language instruction to a model, takes the function the model chooses, and executes it on the running app via `adb`, so the result shows up in the UI. It is the same loop the on-device assistant would run, with `adb` standing in for the preview-gated system integration.
 
+### A run, end to end
+
+Starting state — four actionable tasks:
+
+<img src="assets/demo-before.png" alt="Starting state: four actionable tasks" width="260">
+
+The instruction *"add a high priority task to call the plumber this afternoon"* is sent to a model, which picks one function and its arguments:
+
+```
+addTask({ "title": "Call the plumber this afternoon", "priority": "HIGH" })
+```
+
+That call runs on the device, and the UI updates on its own — five actionable tasks, the new one in place:
+
+<img src="assets/demo-after.png" alt="Result: five actionable tasks, the new one added" width="260">
+
 ## Notes on some decisions
 
 Enum-typed fields cross the agent boundary as documented strings (`"HIGH"`, `"WEEKLY"`), parsed case-insensitively with a default. This is more tolerant of imperfect agent input; whether a closed enum extracts more reliably is one of the things the harness measures.

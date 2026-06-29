@@ -394,6 +394,7 @@ def main():
     ap.add_argument("--model", default=None, help="defaults: gemini-2.5-flash / openai/gpt-4o-mini")
     ap.add_argument("--variants", default="rich,terse")
     ap.add_argument("--goals", default="", help="comma-separated goal filter, e.g. addTask,deleteTask")
+    ap.add_argument("--per-goal", type=int, default=0, help="balanced subset: first N intents per goal")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--sleep", type=float, default=1.0)
     args = ap.parse_args()
@@ -416,6 +417,12 @@ def main():
     if args.goals:
         wanted = {g.strip() for g in args.goals.split(",") if g.strip()}
         dataset = [d for d in dataset if d["goal"] in wanted]
+    if args.per_goal:  # balanced subset: first N of each goal (keeps free-tier runs within caps)
+        from collections import defaultdict
+        grouped = defaultdict(list)
+        for d in dataset:
+            grouped[d["goal"]].append(d)
+        dataset = [x for items in grouped.values() for x in items[:args.per_goal]]
 
     # Preflight: one cheap call; fail fast if the quota is already spent.
     if probe()[0] == "__QUOTA__":

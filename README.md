@@ -88,7 +88,22 @@ The official [Testing Agent](https://github.com/android/appfunctions) discovers 
 
 ## Testing
 
-The domain has unit tests for the graph (cycle detection and reachability), actionability, and each use case, including the cascade unlock and the recurrence date math. The data layer has tests for the entity-to-domain mappers. End-to-end execution is verified through `adb` and the Testing Agent. A harness under `tools/reliability-harness` measures, across several models, how often an agent maps a natural-language request to the correct function and parameters, and how much the wording of the descriptions moves that number.
+The domain has unit tests for the graph (cycle detection and reachability), actionability, and each use case, including the cascade unlock and the recurrence date math. The data layer has tests for the entity-to-domain mappers. End-to-end execution is verified through `adb` and the Testing Agent (and measured across models — see Reliability below).
+
+## Reliability
+
+A harness under `tools/reliability-harness` measures how reliably a model turns a natural-language request into the right function call. Gemini is the reference, but the same dataset runs against GitHub Models (OpenAI, DeepSeek, Mistral, Meta), because the goal is a function surface that any capable model can drive. The dataset is 68 intents covering the five functions plus deliberately out-of-scope requests; it is run twice — with the real descriptions ("rich") and with one-line stand-ins ("terse") — to see how much the wording moves accuracy.
+
+Early results on a balanced 24-intent subset (free tier, single run):
+
+| Model | Function accuracy (rich / terse) | Restraint | Parameters |
+| --- | --- | --- | --- |
+| OpenAI gpt-4.1 | 100% / 100% | 1.00 | 1.00 |
+| Ministral 3B | 83% / 79% | 0.25 | 1.00 |
+
+The useful signal is that a capable model routes the surface perfectly: gpt-4.1 picks the right function every time, with correct parameters, and correctly declines the out-of-scope requests — so the functions and their descriptions are unambiguous. The 3B model routes most intents but lacks restraint, calling a function on requests it should refuse; that is a model-size limit, not an ambiguity in the surface. These are small-subset, single-run numbers and should be read as directional; full 68-intent runs and more models are still to come.
+
+`tools/reliability-harness/agent_demo.py` closes the loop end to end: it sends a natural-language instruction to a model, takes the function the model chooses, and executes it on the running app via `adb`, so the result shows up in the UI. It is the same loop the on-device assistant would run, with `adb` standing in for the preview-gated system integration.
 
 ## Notes on some decisions
 

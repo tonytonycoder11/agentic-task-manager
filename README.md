@@ -1,6 +1,6 @@
 # Agentic Task Manager
 
-An Android task manager that exposes its operations as [AppFunctions](https://developer.android.com/ai/appfunctions) so an on-device agent (Gemini) can call them from natural language. The focus is the agent integration and a measurement of how reliably an agent uses it; the UI is intentionally minimal.
+An Android task manager that exposes its operations as [AppFunctions](https://developer.android.com/ai/appfunctions) so an on-device agent can call them from natural language. Gemini is the reference agent, but the functions are designed and measured to route reliably across function-calling models, not just one. The UI is intentionally minimal.
 
 ## Overview
 
@@ -88,7 +88,7 @@ The official [Testing Agent](https://github.com/android/appfunctions) discovers 
 
 ## Testing
 
-The domain has unit tests for the graph (cycle detection and reachability), actionability, and each use case, including the cascade unlock and the recurrence date math. The data layer has tests for the entity-to-domain mappers. End-to-end execution is verified through `adb` and the Testing Agent. A harness under `tools/reliability-harness` measures how often an agent maps a natural-language request to the correct function and parameters, and how much the wording of the KDoc moves that number.
+The domain has unit tests for the graph (cycle detection and reachability), actionability, and each use case, including the cascade unlock and the recurrence date math. The data layer has tests for the entity-to-domain mappers. End-to-end execution is verified through `adb` and the Testing Agent. A harness under `tools/reliability-harness` measures, across several models, how often an agent maps a natural-language request to the correct function and parameters, and how much the wording of the descriptions moves that number.
 
 ## Notes on some decisions
 

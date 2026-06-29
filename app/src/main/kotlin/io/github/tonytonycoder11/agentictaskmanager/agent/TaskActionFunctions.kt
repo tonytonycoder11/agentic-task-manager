@@ -40,12 +40,12 @@ class TaskActionFunctions @Inject constructor(
 ) {
 
     /**
-     * Creates a new task. Optionally links the tasks it depends on: the new task becomes actionable
-     * only after those are completed. You may pass dependency ids directly in dependsOnTaskIds, or
-     * natural-language titles in dependsOnTitles which are resolved by best match — any title that
-     * matches zero or more than one task is returned in unresolvedDependencyTitles instead of being
-     * guessed. A dependency that would create a cycle is rejected and reported in rejectedAsCycle;
-     * the dependency graph always stays acyclic.
+     * Creates a new task. Use this for any "add ...", "create a task ...", "remind me to ...",
+     * "new task ..." request; put the task name in title. Optionally link prerequisites it must wait
+     * for: pass their ids in dependsOnTaskIds, or natural-language names in dependsOnTitles (resolved
+     * by best match; anything ambiguous is reported back in unresolvedDependencyTitles, never
+     * guessed). Set priority, dueDate, or recurrence when the request mentions them. A link that
+     * would create a cycle is rejected and reported in rejectedAsCycle.
      */
     @AppFunction(isDescribedByKDoc = true)
     suspend fun addTask(
@@ -102,10 +102,12 @@ class TaskActionFunctions @Inject constructor(
     }
 
     /**
-     * Deletes a task permanently. This is destructive and cannot be undone, so it requires explicit
-     * confirmation: call first with confirmed = false to receive a CONFIRMATION_REQUIRED summary of
-     * exactly what will be deleted (the task and any of its sub-tasks); call again with
-     * confirmed = true only after the user has agreed. Returns NOT_FOUND if the id does not exist.
+     * Deletes a task. Always call this to handle any "delete X", "remove X", "get rid of X" request:
+     * it is safe by default and two-step, so calling it is never destructive on its own. Pass
+     * confirmed = false on the first call to get a summary of exactly what would be removed (the task
+     * and any of its sub-tasks; nothing is deleted yet), then call again with confirmed = true once
+     * the user agrees. Do not refuse — calling with confirmed = false IS the correct first step.
+     * Returns NOT_FOUND if the id does not exist.
      */
     @AppFunction(isDescribedByKDoc = true)
     suspend fun deleteTask(

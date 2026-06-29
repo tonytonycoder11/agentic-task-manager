@@ -1,0 +1,46 @@
+# --- Android / Gradle / IntelliJ standard ignore ---
+# Build outputs
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local configuration (SDK path, secrets) — must never be committed
+local.properties
+
+# IDE
+.idea/
+*.hprof
+
+# Keystore / signing — keep secrets out of a public repo
+*.jks
+*.keystore
+
+# OS noise
+.DS_Store
+
+# Secrets used only for local testing (e.g. Gemini API key for the Testing Agent retail flavor)
+secrets.properties
+gemini.api.key
+*.api.key
+
+# Kotlin compiler daemon
+.kotlin/
+
+# --- Internal planning / study notes — NOT part of the published project ---
+/PLAN.md
+/docs/
+
+# Reliability-harness runtime artifacts (the tool + dataset are kept; logs/reports are not)
+/tools/reliability-harness/run.log
+/tools/reliability-harness/report-*.json
+/tools/reliability-harness/.instrumentation_output.txt
+
+# Generated documents (the technical PDF is delivered privately, not committed)
+*.pdf
+
+# Python bytecode cache
+__pycache__/
+*.pyc

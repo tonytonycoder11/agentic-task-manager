@@ -1,0 +1,705 @@
+{
+  "dataset": [
+    {
+      "id": "i1",
+      "goal": "getActionableTasks",
+      "intent": "what can i work on now",
+      "style": "terse, lowercase",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Canonical bare-bones phrasing of the actionable-tasks intent."
+    },
+    {
+      "id": "i2",
+      "goal": "getActionableTasks",
+      "intent": "Hi! I've got a bit of downtime this afternoon and I'd love to be productive \u2014 could you tell me which of my tasks are actually ready to be started right now, the ones that aren't waiting on anything else?",
+      "style": "verbose, polite",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Long courteous request; 'not waiting on anything else' maps directly to prerequisites-completed semantics."
+    },
+    {
+      "id": "i3",
+      "goal": "getActionableTasks",
+      "intent": "gimme stuff i can actually knock out rn",
+      "style": "slang, abrupt",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Casual slang; 'actually knock out' implies tasks not blocked."
+    },
+    {
+      "id": "i4",
+      "goal": "getActionableTasks",
+      "intent": "whats unblocked",
+      "style": "terse, no punctuation",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Single-keyword phrasing directly using the 'unblocked' concept."
+    },
+    {
+      "id": "i5",
+      "goal": "getActionableTasks",
+      "intent": "ok im finally free. whats ready to go that nothing is holding up?",
+      "style": "indirect, conversational",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Indirect lead-in; 'nothing is holding up' = no pending prerequisites."
+    },
+    {
+      "id": "i6",
+      "goal": "getActionableTasks",
+      "intent": "whihc tasks can i strat on right now",
+      "style": "typos",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Two typos (whihc, strat); intent still clearly actionable tasks."
+    },
+    {
+      "id": "i7",
+      "goal": "getActionableTasks",
+      "intent": "What should I focus on?",
+      "style": "polite, short",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Classic 'what should I focus on' framing from the spec."
+    },
+    {
+      "id": "i8",
+      "goal": "getActionableTasks",
+      "intent": "show me everything that's good to go \u2014 i don't wanna see anything that's blocked or waiting on a dependency",
+      "style": "verbose, casual",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Explicitly excludes blocked/dependent items, reinforcing actionable filter."
+    },
+    {
+      "id": "i9",
+      "goal": "getActionableTasks",
+      "intent": "next.",
+      "style": "extremely terse",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Single word; in a task-flow context 'next' implies the next doable thing."
+    },
+    {
+      "id": "i10",
+      "goal": "getActionableTasks",
+      "intent": "I'm not sure where to start today. Which things on my list don't have any prerequisites left so I could just dive in?",
+      "style": "indirect, reflective",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Reflective uncertainty; 'no prerequisites left' is the actionable definition verbatim."
+    },
+    {
+      "id": "i11",
+      "goal": "getActionableTasks",
+      "intent": "what's actionable",
+      "style": "terse, jargon",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "Uses the domain term 'actionable' directly."
+    },
+    {
+      "id": "i12",
+      "goal": "getActionableTasks",
+      "intent": "yo just list the stuff i can crack on with, skip anything thats stuck behind other tasks",
+      "style": "slang, run-on",
+      "expectedFunction": "getActionableTasks",
+      "expectedParams": {},
+      "notes": "British-ish slang ('crack on'); 'stuck behind other tasks' = blocked items excluded."
+    },
+    {
+      "id": "i13",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "what's overdue and holding up other stuff?",
+      "style": "casual",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Core both-conditions phrasing: overdue AND blocking. Distinct from plain 'what's overdue'."
+    },
+    {
+      "id": "i14",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "show me late tasks that are blocking everything else",
+      "style": "imperative",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "'late' = overdue, 'blocking everything else' = blocks other open tasks."
+    },
+    {
+      "id": "i15",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "which past-due items are gating other work",
+      "style": "terse",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "'past-due' and 'gating' (engineer phrasing) both clearly map to overdue+blocking."
+    },
+    {
+      "id": "i16",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "im behind on something that everything depends on, whats stuck",
+      "style": "typo",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Anxious user; 'everything depends on' = blocking, 'behind' = overdue. Missing apostrophes."
+    },
+    {
+      "id": "i17",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "what overdue task is the bottleneck right now",
+      "style": "indirect",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "'bottleneck' is a softer synonym for blocking; combined with overdue."
+    },
+    {
+      "id": "i18",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "any blockers that are also past their deadline?",
+      "style": "polite",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Leads with 'blockers' then adds the overdue condition. Order reversed vs typical phrasing."
+    },
+    {
+      "id": "i19",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "what's late AND blocking? not just everything overdue",
+      "style": "explicit-contrast",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "User explicitly distinguishes from plain overdue, ruling out the ambiguous single-condition read."
+    },
+    {
+      "id": "i20",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "give me the overdue stuff that's stopping me from moving forward on other things",
+      "style": "verbose",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Long-winded; 'stopping me from moving forward on other things' = blocks other tasks."
+    },
+    {
+      "id": "i21",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "what's the holdup \u2014 anything overdue that other tasks are waiting on",
+      "style": "spoken",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Conversational; 'other tasks are waiting on' is the dependency/blocking signal."
+    },
+    {
+      "id": "i22",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "find tasks I missed the deadline on that are still in someone else's way",
+      "style": "narrative",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "'missed the deadline' = overdue; 'in the way' = blocking. Casual framing of the prerequisite relation."
+    },
+    {
+      "id": "i23",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "overdue + on the critical path, show those",
+      "style": "shorthand",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "PM jargon 'critical path' implies blocking downstream work; '+' joins with overdue."
+    },
+    {
+      "id": "i24",
+      "goal": "getBlockingOverdueTasks",
+      "intent": "I keep getting stuck \u2014 what's late that's choking the rest of my list",
+      "style": "frustrated",
+      "expectedFunction": "getBlockingOverdueTasks",
+      "expectedParams": {},
+      "notes": "Emotional/venting tone; 'choking the rest of my list' = blocking other open tasks, 'late' = overdue."
+    },
+    {
+      "id": "i25",
+      "goal": "addTask",
+      "intent": "add buy coffee",
+      "style": "terse",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Buy coffee"
+      },
+      "notes": "Plain create, no extras. Just a title."
+    },
+    {
+      "id": "i26",
+      "goal": "addTask",
+      "intent": "urgent: call the bank about the overdraft",
+      "style": "label-prefix",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Call the bank about the overdraft",
+        "priority": "URGENT"
+      },
+      "notes": "Priority signaled by 'urgent:' prefix. Strip the label from the title."
+    },
+    {
+      "id": "i27",
+      "goal": "addTask",
+      "intent": "can you add submit the quarterly report by friday",
+      "style": "polite-relative-date",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Submit the quarterly report",
+        "dueDate": "2026-07-03"
+      },
+      "notes": "Relative due date 'friday' -> next Friday from 2026-06-28 (Sun) is 2026-07-03. Title drops the date clause."
+    },
+    {
+      "id": "i28",
+      "goal": "addTask",
+      "intent": "new task: email the sponsors \u2014 but it can only start once the slides are done",
+      "style": "verbose-dependency-by-title",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Email the sponsors",
+        "dependsOnTitles": [
+          "Prepare slides"
+        ]
+      },
+      "notes": "Dependency by title on existing t-slides 'Prepare slides'. Use dependsOnTitles since user named it, not an id."
+    },
+    {
+      "id": "i29",
+      "goal": "addTask",
+      "intent": "remind me to take out the trash every week",
+      "style": "spoken-recurrence",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Take out the trash",
+        "recurrence": "WEEKLY"
+      },
+      "notes": "Recurrence WEEKLY from 'every week'. 'remind me to' is framing, not part of the title."
+    },
+    {
+      "id": "i30",
+      "goal": "addTask",
+      "intent": "high priority \u2014 finish the tax paperwork before the 15th of july",
+      "style": "dash-priority-plus-date",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Finish the tax paperwork",
+        "priority": "HIGH",
+        "dueDate": "2026-07-15"
+      },
+      "notes": "Two signals: HIGH priority and an absolute due date 2026-07-15."
+    },
+    {
+      "id": "i31",
+      "goal": "addTask",
+      "intent": "gotta book the flights, only after the venue is locked in tho",
+      "style": "slang-dependency",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Book the flights",
+        "dependsOnTitles": [
+          "Book venue"
+        ]
+      },
+      "notes": "Casual phrasing; 'after the venue is locked in' -> depends on existing t-venue 'Book venue' by title."
+    },
+    {
+      "id": "i32",
+      "goal": "addTask",
+      "intent": "add a recurring task to pay rent on the 1st of every month",
+      "style": "explicit-monthly-recurrence",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Pay rent",
+        "recurrence": "MONTHLY"
+      },
+      "notes": "MONTHLY recurrence from 'every month'. 'on the 1st' is the recurrence anchor, captured by recurrence not a one-off dueDate."
+    },
+    {
+      "id": "i33",
+      "goal": "addTask",
+      "intent": "pls add: review pull requests, daily, its low prio",
+      "style": "typo-shorthand-multi",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Review pull requests",
+        "priority": "LOW",
+        "recurrence": "DAILY"
+      },
+      "notes": "Sloppy typed input. DAILY recurrence + LOW priority ('low prio'). Title cleaned up."
+    },
+    {
+      "id": "i34",
+      "goal": "addTask",
+      "intent": "I need to confirm the catering headcount by end of day tomorrow, make it urgent",
+      "style": "indirect-firstperson",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Confirm the catering headcount",
+        "priority": "URGENT",
+        "dueDate": "2026-06-29"
+      },
+      "notes": "Indirect 'I need to' framing. 'tomorrow' from 2026-06-28 -> 2026-06-29. 'make it urgent' -> URGENT."
+    },
+    {
+      "id": "i35",
+      "goal": "addTask",
+      "intent": "stick draft the meetup recap blog post on my list, it shouldn't kick off until I've actually presented at the GDG meetup",
+      "style": "narrative-dependency-by-title",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Draft the meetup recap blog post",
+        "dependsOnTitles": [
+          "Present at the GDG meetup"
+        ]
+      },
+      "notes": "Long conversational phrasing; dependency on existing t-present 'Present at the GDG meetup' by title."
+    },
+    {
+      "id": "i36",
+      "goal": "addTask",
+      "intent": "schedule dentist appointment, medium priority, due next monday, and remind me again every 6 months",
+      "style": "kitchen-sink",
+      "expectedFunction": "addTask",
+      "expectedParams": {
+        "title": "Schedule dentist appointment",
+        "priority": "MEDIUM",
+        "dueDate": "2026-06-29"
+      },
+      "notes": "MEDIUM + dueDate 'next monday' from Sun 2026-06-28 -> 2026-06-29. 'every 6 months' has no matching recurrence enum (only NONE/DAILY/WEEKLY/MONTHLY), so recurrence is intentionally omitted \u2014 tests that the agent does not force-fit an unsupported value."
+    },
+    {
+      "id": "i37",
+      "goal": "completeTask",
+      "intent": "just grabbed milk on the way home, mark that one off",
+      "style": "casual, contraction-free conversational",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-milk"
+      },
+      "notes": "Refers to 'Buy milk' by paraphrasing the action."
+    },
+    {
+      "id": "i38",
+      "goal": "completeTask",
+      "intent": "Slides are done. Tick it.",
+      "style": "terse, two-sentence",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-slides"
+      },
+      "notes": "'Slides' clearly maps to 'Prepare slides'."
+    },
+    {
+      "id": "i39",
+      "goal": "completeTask",
+      "intent": "can you check off the venue booking? finally got it locked in",
+      "style": "polite, relieved",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-venue"
+      },
+      "notes": "'venue booking' maps to 'Book venue'."
+    },
+    {
+      "id": "i40",
+      "goal": "completeTask",
+      "intent": "watered the plants this morning, that's complete",
+      "style": "matter-of-fact past-tense report",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-plants"
+      },
+      "notes": "Maps to weekly 'Water the plants'."
+    },
+    {
+      "id": "i41",
+      "goal": "completeTask",
+      "intent": "i did my talk at the gdg meetup, mark it finished",
+      "style": "casual, lowercase",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-present"
+      },
+      "notes": "'talk at the gdg meetup' maps to 'Present at the GDG meetup'."
+    },
+    {
+      "id": "i42",
+      "goal": "completeTask",
+      "intent": "done w the milk run",
+      "style": "slang, abbreviated",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-milk"
+      },
+      "notes": "'milk run' colloquially refers to 'Buy milk'."
+    },
+    {
+      "id": "i43",
+      "goal": "completeTask",
+      "intent": "Please mark the slide deck as complete \u2014 wrapped it up last night.",
+      "style": "polite, full sentence",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-slides"
+      },
+      "notes": "'slide deck' maps to 'Prepare slides'."
+    },
+    {
+      "id": "i44",
+      "goal": "completeTask",
+      "intent": "venu sorted, close it out",
+      "style": "typo, terse",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-venue"
+      },
+      "notes": "Misspelled 'venue'; maps to 'Book venue'."
+    },
+    {
+      "id": "i45",
+      "goal": "completeTask",
+      "intent": "presentation went great, you can knock that off the list",
+      "style": "upbeat, indirect",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-present"
+      },
+      "notes": "'presentation' maps to 'Present at the GDG meetup'."
+    },
+    {
+      "id": "i46",
+      "goal": "completeTask",
+      "intent": "the plants are watered for the week, good to mark done",
+      "style": "detailed, calm",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-plants"
+      },
+      "notes": "References weekly cadence of 'Water the plants'."
+    },
+    {
+      "id": "i47",
+      "goal": "completeTask",
+      "intent": "yo finished prepping the slides, cross it off",
+      "style": "slang, energetic",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-slides"
+      },
+      "notes": "'prepping the slides' maps directly to 'Prepare slides'."
+    },
+    {
+      "id": "i48",
+      "goal": "completeTask",
+      "intent": "I went ahead and booked the venue already, so that task is taken care of",
+      "style": "verbose, explanatory",
+      "expectedFunction": "completeTask",
+      "expectedParams": {
+        "taskId": "t-venue"
+      },
+      "notes": "'booked the venue' maps to 'Book venue'."
+    },
+    {
+      "id": "i49",
+      "goal": "deleteTask",
+      "intent": "delete the buy milk task",
+      "style": "terse",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-milk"
+      },
+      "notes": "Direct verb + exact title match to t-milk. confirmed left unset so the agent does the safe confirmation step first."
+    },
+    {
+      "id": "i50",
+      "goal": "deleteTask",
+      "intent": "ugh I already booked the venue ages ago, just get rid of that reminder",
+      "style": "verbose/casual",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-venue"
+      },
+      "notes": "Conversational 'get rid of' referring to Book venue -> t-venue. No confirmed; this is a destructive op on an URGENT blocker, agent should confirm first."
+    },
+    {
+      "id": "i51",
+      "goal": "deleteTask",
+      "intent": "Can you remove \"Water the plants\" from my list please?",
+      "style": "polite",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-plants"
+      },
+      "notes": "Quoted exact title -> t-plants. Recurring weekly task, but request is to delete it outright."
+    },
+    {
+      "id": "i52",
+      "goal": "deleteTask",
+      "intent": "scrap the slides prep",
+      "style": "slang/abrupt",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-slides"
+      },
+      "notes": "'scrap' = delete; 'slides prep' maps to Prepare slides -> t-slides."
+    },
+    {
+      "id": "i53",
+      "goal": "deleteTask",
+      "intent": "i dont think im doing the gdg talk anymore, kill that task",
+      "style": "casual/typo",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-present"
+      },
+      "notes": "'gdg talk' refers to Present at the GDG meetup -> t-present. 'kill that task' = delete. Missing apostrophe is intentional typo style."
+    },
+    {
+      "id": "i54",
+      "goal": "deleteTask",
+      "intent": "Remove task t-milk",
+      "style": "technical/id-based",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-milk"
+      },
+      "notes": "User references the raw id directly -> t-milk."
+    },
+    {
+      "id": "i55",
+      "goal": "deleteTask",
+      "intent": "nah cancel the milk one, got it on the way home",
+      "style": "indirect/casual",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-milk"
+      },
+      "notes": "'milk one' -> Buy milk -> t-milk. 'cancel' read as delete here. Note potential ambiguity with completeTask, but phrasing 'cancel...one' leans delete."
+    },
+    {
+      "id": "i56",
+      "goal": "deleteTask",
+      "intent": "take the venue booking off my todo list",
+      "style": "neutral",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-venue"
+      },
+      "notes": "'venue booking' -> Book venue -> t-venue. 'take off my list' = delete."
+    },
+    {
+      "id": "i57",
+      "goal": "deleteTask",
+      "intent": "pls delete prepare slides AND book venue, changed my mind on the whole thing",
+      "style": "terse/multi",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-slides"
+      },
+      "notes": "Two deletions requested; primary/first target is Prepare slides -> t-slides. Agent would handle each separately; this item captures the first. Both are blockers, so confirmation matters."
+    },
+    {
+      "id": "i58",
+      "goal": "deleteTask",
+      "intent": "Could you please go ahead and erase the 'Present at the GDG meetup' item entirely? I've decided to back out.",
+      "style": "verbose/polite",
+      "expectedFunction": "deleteTask",
+      "expectedParams": {
+        "taskId": "t-present"
+      },
+      "notes": "'erase ... entirely' = delete; quoted exact title -> t-present. confirmed left unset for the safe-first-step default."
+    },
+    {
+      "id": "i59",
+      "goal": "NONE",
+      "intent": "what's the weather looking like in Milan tomorrow? should I bring an umbrella",
+      "style": "casual, conversational",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Classic out-of-scope: weather lookup. No task verb at all. Agent must not invent a task from 'tomorrow' or 'umbrella'."
+    },
+    {
+      "id": "i60",
+      "goal": "NONE",
+      "intent": "set an alarm for 6:45 so I don't oversleep before the meetup",
+      "style": "imperative, terse",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Alarm/clock is a different system capability. The mention of 'meetup' is a decoy toward t-present; agent must resist addTask. No alarm function exists, so NONE."
+    },
+    {
+      "id": "i61",
+      "goal": "NONE",
+      "intent": "can you call my mum and let her know I'll be late",
+      "style": "polite, spoken",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Phone/messaging action, not a task operation. Trap: 'let her know' could be misread as adding a reminder-task; correct restraint is NONE."
+    },
+    {
+      "id": "i62",
+      "goal": "NONE",
+      "intent": "summarize the emails I got from the venue people this week",
+      "style": "work request",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Email summarization is out of scope. Strong decoy: 'venue' overlaps t-venue title; agent must NOT route to any task function on keyword match alone."
+    },
+    {
+      "id": "i63",
+      "goal": "NONE",
+      "intent": "ugh. help",
+      "style": "vague, frustrated, minimal",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Genuinely ambiguous one-word plea. No actionable intent maps to a specific function; agent should ask for clarification rather than guess getActionableTasks."
+    },
+    {
+      "id": "i64",
+      "goal": "NONE",
+      "intent": "hey what time is it right now",
+      "style": "casual question",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Clock query, no task semantics. Pure restraint check."
+    },
+    {
+      "id": "i65",
+      "goal": "NONE",
+      "intent": "translate 'thanks for hosting us' into German for me",
+      "style": "direct request",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Translation is unrelated to task management. No function fits, so NONE."
+    },
+    {
+      "id": "i66",
+      "goal": "NONE",
+      "intent": "how many days until the GDG meetup, and what's the venue's address?",
+      "style": "compound, info-seeking",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Both halves are information lookups (date math + address), not task operations. Heavy decoy with 'GDG meetup' and 'venue'; the 5 functions cannot answer either, so NONE."
+    },
+    {
+      "id": "i67",
+      "goal": "NONE",
+      "intent": "play some lo-fi while I work through my list",
+      "style": "offhand, slang",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Music playback request. 'my list' is a lure toward getActionableTasks but the actual asked action (play music) has no function; restraint = NONE."
+    },
+    {
+      "id": "i68",
+      "goal": "NONE",
+      "intent": "do you think I should cancel the whole talk or just push through?",
+      "style": "reflective, advice-seeking",
+      "expectedFunction": "NONE",
+      "expectedParams": {},
+      "notes": "Open-ended advice/opinion question. 'cancel' tempts deleteTask and 'talk' tempts t-present, but the user is asking for judgment, not issuing a command; agent must not fire deleteTask. NONE."
+    }
+  ]
+}

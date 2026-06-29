@@ -1,0 +1,9 @@
+<resources>
+    <!--
+      A minimal Material 3 theme. The actual colors are driven by Compose (dynamic color where
+      available); this XML theme exists only so the Activity has a valid launch theme before
+      Compose takes over. The UI is deliberately minimal — the value of this project is the
+      domain and the agent layer, not the visuals.
+    -->
+    <style name="Theme.AgenticTaskManager" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

@@ -34,7 +34,7 @@ gemini.api.key
 /docs/
 
 # Reliability-harness runtime artifacts (the tool + dataset are kept; logs/reports are not)
-/tools/reliability-harness/run.log
+/tools/reliability-harness/*.log
 /tools/reliability-harness/report-*.json
 /tools/reliability-harness/.instrumentation_output.txt
 

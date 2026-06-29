@@ -1,8 +1,0 @@
-[rich] 1/22 i25 exp=addTask got=addTask fn=ok
-[rich] 2/22 i26 exp=addTask got=addTask fn=ok
-[rich] 3/22 i27 exp=addTask got=addTask fn=ok
-[rich] 4/22 i28 exp=addTask got=addTask fn=ok
-[rich] 5/22 i29 exp=addTask got=addTask fn=ok
-[rich] 6/22 i30 exp=addTask got=addTask fn=ok
-[rich] 7/22 i31 exp=addTask got=addTask fn=ok
-Aborted (quota hit at i32 (8/22, variant=rich)). Quota ran out mid-run; partial results not written.

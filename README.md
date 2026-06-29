@@ -1,8 +1,6 @@
 # Agentic Task Manager
 
-An Android task manager that exposes its operations as [AppFunctions](https://developer.android.com/ai/appfunctions) so an on-device agent (Gemini) can call them from natural language. The focus of the project is the agent integration and a measurement of how reliably an agent uses it. The UI is intentionally minimal.
-
-It is developed in the open as part of a Google Developer Expert application, one phase at a time.
+An Android task manager that exposes its operations as [AppFunctions](https://developer.android.com/ai/appfunctions) so an on-device agent (Gemini) can call them from natural language. The focus is the agent integration and a measurement of how reliably an agent uses it; the UI is intentionally minimal.
 
 ## Overview
 
@@ -102,7 +100,7 @@ The write use cases read, check, then write (load the graph, test for a cycle, p
 
 ## Status
 
-Phases 0 to 3 are complete: research and plan; the domain with Room persistence, a Compose UI and unit tests; the functions exposed and invoked over `adb`; and the official Testing Agent connected. The reliability harness (phase 4) is in progress.
+The domain, Room persistence, the Compose UI, and the five AppFunctions are implemented and unit-tested. The functions are invocable over `adb` and through the official Testing Agent. The reliability harness is in place; collecting and publishing its numbers is the remaining work.
 
 ## License
 

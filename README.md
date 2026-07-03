@@ -1,5 +1,7 @@
 # Agentic Task Manager
 
+[![CI](https://github.com/tonytonycoder11/agentic-task-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/tonytonycoder11/agentic-task-manager/actions/workflows/ci.yml)
+
 An Android task manager whose operations are exposed as [AppFunctions](https://developer.android.com/ai/appfunctions), so an on-device agent can carry them out from natural language. Gemini is the reference agent, but the functions are written and measured to route reliably across function-calling models rather than a single one. The user interface is deliberately minimal; the subject of the project is the agent-facing layer and how reliably it can be driven.
 
 ## Overview

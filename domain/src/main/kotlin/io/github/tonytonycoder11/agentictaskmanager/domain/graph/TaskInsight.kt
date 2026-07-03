@@ -1,5 +1,6 @@
 package io.github.tonytonycoder11.agentictaskmanager.domain.graph
 
+import io.github.tonytonycoder11.agentictaskmanager.domain.model.DependencyEdge
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.Task
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
@@ -28,7 +29,7 @@ object TaskInsights {
      */
     fun computeAll(
         tasks: List<Task>,
-        edges: List<io.github.tonytonycoder11.agentictaskmanager.domain.model.DependencyEdge>,
+        edges: List<DependencyEdge>,
     ): List<TaskInsight> {
         val graph = DependencyGraph.of(edges)
         val statusById: Map<TaskId, TaskStatus> = tasks.associate { it.id to it.status }

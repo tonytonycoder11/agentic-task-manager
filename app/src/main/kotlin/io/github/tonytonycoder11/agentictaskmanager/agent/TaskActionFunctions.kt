@@ -15,6 +15,7 @@ import io.github.tonytonycoder11.agentictaskmanager.agent.mapper.toDto
 import io.github.tonytonycoder11.agentictaskmanager.agent.mapper.toPriorityOrDefault
 import io.github.tonytonycoder11.agentictaskmanager.agent.mapper.toRecurrenceOrDefault
 import io.github.tonytonycoder11.agentictaskmanager.agent.mapper.toTaskIdOrInvalid
+import io.github.tonytonycoder11.agentictaskmanager.di.IoDispatcher
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 import io.github.tonytonycoder11.agentictaskmanager.domain.support.TaskNotFoundException
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.AddTaskCommand
@@ -22,7 +23,7 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.AddTaskUseCas
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.CompleteTaskUseCase
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.DeleteTaskUseCase
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetTaskInsightUseCase
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -36,6 +37,7 @@ class TaskActionFunctions @Inject constructor(
     private val completeTaskUseCase: CompleteTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val getTaskInsightUseCase: GetTaskInsightUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -50,7 +52,7 @@ class TaskActionFunctions @Inject constructor(
     suspend fun addTask(
         appFunctionContext: AppFunctionContext,
         params: AddTaskParams,
-    ): AddTaskResultDto = withContext(Dispatchers.IO) {
+    ): AddTaskResultDto = withContext(ioDispatcher) {
         if (params.title.isBlank()) {
             throw AppFunctionInvalidArgumentException("title must not be blank")
         }
@@ -86,7 +88,7 @@ class TaskActionFunctions @Inject constructor(
     suspend fun completeTask(
         appFunctionContext: AppFunctionContext,
         params: CompleteTaskParams,
-    ): CompleteTaskResultDto = withContext(Dispatchers.IO) {
+    ): CompleteTaskResultDto = withContext(ioDispatcher) {
         val id = params.taskId.toTaskIdOrInvalid()
         val result = try {
             completeTaskUseCase(id)
@@ -112,7 +114,7 @@ class TaskActionFunctions @Inject constructor(
     suspend fun deleteTask(
         appFunctionContext: AppFunctionContext,
         params: DeleteTaskParams,
-    ): DeleteTaskResultDto = withContext(Dispatchers.IO) {
+    ): DeleteTaskResultDto = withContext(ioDispatcher) {
         val id = params.taskId.toTaskIdOrInvalid()
         val result = deleteTaskUseCase(id, params.confirmed)
         DeleteTaskResultDto(

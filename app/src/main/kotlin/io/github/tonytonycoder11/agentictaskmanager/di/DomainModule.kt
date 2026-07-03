@@ -15,6 +15,7 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetActionable
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetBlockingOverdueUseCase
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetTaskInsightUseCase
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.ObserveTaskBoardUseCase
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,6 +44,10 @@ object DomainModule {
     @ApplicationScope
     fun provideApplicationScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @Provides
+    @IoDispatcher
+    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     /**
      * A single app-wide lock shared by every write use case, serializing their read-check-write

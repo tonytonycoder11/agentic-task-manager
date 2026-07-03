@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -75,6 +76,7 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.Priority
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.Recurrence
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
+import io.github.tonytonycoder11.agentictaskmanager.ui.theme.AtmTheme
 import io.github.tonytonycoder11.agentictaskmanager.ui.theme.LocalStatusColors
 
 /**
@@ -82,7 +84,10 @@ import io.github.tonytonycoder11.agentictaskmanager.ui.theme.LocalStatusColors
  * (a cycle is rejected), and delete a task (two-step confirmation).
  */
 @Composable
-fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
+fun TaskListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: TaskListViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val pendingDeletion by viewModel.pendingDeletion.collectAsStateWithLifecycle()
 
@@ -97,6 +102,7 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
     var recurrenceFilter by remember { mutableStateOf<Recurrence?>(null) }
 
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
@@ -566,6 +572,30 @@ private fun priorityColor(priority: Priority): Color {
         Priority.HIGH -> s.priorityHigh
         Priority.MEDIUM -> s.priorityMedium
         Priority.LOW -> s.priorityLow
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TaskCardPreview() {
+    AtmTheme {
+        TaskCard(
+            row = TaskRowUi(
+                id = TaskId("preview"),
+                title = "Prepare slides",
+                description = null,
+                priority = Priority.HIGH,
+                status = TaskStatus.OPEN,
+                isActionable = true,
+                dueLabel = "Jul 1, 09:00",
+                isOverdue = false,
+                blockedByTitles = emptyList(),
+                blocksCount = 1,
+                recurrence = Recurrence.WEEKLY,
+            ),
+            onComplete = {},
+            onDelete = {},
+        )
     }
 }
 

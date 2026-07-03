@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -47,6 +48,11 @@ class TaskListViewModel @Inject constructor(
     val uiState: StateFlow<TaskListUiState> =
         observeTaskBoard()
             .map { insights -> buildState(insights) }
+            .catch {
+                // Keep the screen alive if the task stream fails, and surface it.
+                messages.trySend("Couldn't load tasks.")
+                emit(TaskListUiState())
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),

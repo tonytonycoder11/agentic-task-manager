@@ -5,21 +5,23 @@ import androidx.appfunctions.service.AppFunction
 import io.github.tonytonycoder11.agentictaskmanager.agent.dto.ActionableTasksResult
 import io.github.tonytonycoder11.agentictaskmanager.agent.dto.BlockingOverdueResult
 import io.github.tonytonycoder11.agentictaskmanager.agent.mapper.toDto
+import io.github.tonytonycoder11.agentictaskmanager.di.IoDispatcher
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetActionableTasksUseCase
 import io.github.tonytonycoder11.agentictaskmanager.domain.usecase.GetBlockingOverdueUseCase
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
  * Read-only AppFunctions over the dependency graph. Thin adapters: each calls a domain use case and
  * maps the result to a DTO. Hilt constructs the class; the Application's AppFunctionConfiguration
- * hands the instance to the system. Work runs on [Dispatchers.IO], since AppFunctions dispatch on the
- * main thread by default.
+ * hands the instance to the system. Work runs on an injected IO dispatcher, since AppFunctions
+ * dispatch on the main thread by default.
  */
 class TaskQueryFunctions @Inject constructor(
     private val getActionableTasksUseCase: GetActionableTasksUseCase,
     private val getBlockingOverdueUseCase: GetBlockingOverdueUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -29,7 +31,7 @@ class TaskQueryFunctions @Inject constructor(
      */
     @AppFunction(isDescribedByKDoc = true)
     suspend fun getActionableTasks(appFunctionContext: AppFunctionContext): ActionableTasksResult =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             ActionableTasksResult(getActionableTasksUseCase().map { it.toDto() })
         }
 
@@ -41,7 +43,7 @@ class TaskQueryFunctions @Inject constructor(
      */
     @AppFunction(isDescribedByKDoc = true)
     suspend fun getBlockingOverdueTasks(appFunctionContext: AppFunctionContext): BlockingOverdueResult =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             BlockingOverdueResult(getBlockingOverdueUseCase().map { it.toDto() })
         }
 }

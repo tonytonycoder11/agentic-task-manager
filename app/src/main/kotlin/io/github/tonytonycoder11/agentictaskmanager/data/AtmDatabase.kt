@@ -7,10 +7,7 @@ import io.github.tonytonycoder11.agentictaskmanager.data.dao.TaskDao
 import io.github.tonytonycoder11.agentictaskmanager.data.entity.DependencyEntity
 import io.github.tonytonycoder11.agentictaskmanager.data.entity.TaskEntity
 
-/**
- * The Room database. Two tables — tasks and their dependency edges — which together persist the
- * dependency graph. Schema export is disabled for Phase 1 (no migrations yet, version 1).
- */
+/** Room database persisting tasks and their dependency edges. */
 @Database(
     entities = [TaskEntity::class, DependencyEntity::class],
     version = 1,

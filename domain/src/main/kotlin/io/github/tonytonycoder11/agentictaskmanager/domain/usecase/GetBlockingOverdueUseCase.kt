@@ -7,11 +7,10 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.repository.TaskReposi
 import java.time.Clock
 
 /**
- * Returns the highest-leverage problems: OPEN tasks that are past their due date AND are still
- * blocking at least one other OPEN task. These are both late and holding up the rest of the
- * plan, so they deserve attention first.
+ * Returns OPEN tasks that are past their due date and still blocking at least one other OPEN task —
+ * both late and holding up the plan, so they deserve attention first.
  *
- * "Now" comes from an injected [Clock], so overdue-ness is deterministic under test.
+ * "Now" comes from an injected [Clock] for deterministic tests.
  */
 class GetBlockingOverdueUseCase(
     private val repository: TaskRepository,

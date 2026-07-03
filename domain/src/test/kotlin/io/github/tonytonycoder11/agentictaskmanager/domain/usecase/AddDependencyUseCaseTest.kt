@@ -56,7 +56,7 @@ class AddDependencyUseCaseTest {
 
     @Test
     fun `rejects a dependency that would create a cycle`() = runTest {
-        // B already depends on A; making A depend on B would close a cycle.
+        // B depends on A, so making A depend on B would close a cycle.
         val repo = FakeTaskRepository(
             initialTasks = listOf(task("A"), task("B")),
             initialEdges = listOf(DependencyEdge(TaskId("B"), TaskId("A"))),
@@ -66,7 +66,7 @@ class AddDependencyUseCaseTest {
         val result = useCase(dependentId = TaskId("A"), prerequisiteId = TaskId("B"))
 
         assertEquals(AddDependencyOutcome.REJECTED_CYCLE, result.outcome)
-        // The rejected edge must NOT have been persisted.
+        // Rejected edge must not be persisted.
         assertEquals(listOf(DependencyEdge(TaskId("B"), TaskId("A"))), repo.getAllDependencies())
     }
 }

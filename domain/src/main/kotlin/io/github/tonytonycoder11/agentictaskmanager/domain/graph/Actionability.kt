@@ -5,34 +5,27 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
 
 /**
- * The rule at the centre of the whole product: **a task is _actionable_ if and only if it is
- * OPEN and every one of its prerequisites is COMPLETED.**
+ * A task is actionable iff it is OPEN and every prerequisite is COMPLETED.
  *
- * Actionability is never stored — it is derived from the graph plus the current status of
- * other tasks, so it stays correct automatically as tasks are completed. These helpers are
- * pure functions over a [DependencyGraph] and a status lookup.
+ * Actionability is derived, never stored, so it stays correct as tasks complete.
  */
 object Actionability {
 
     /**
-     * Status lookup for a task id. Returns null if the id is unknown (e.g. a dangling
-     * prerequisite), which we deliberately treat as "not completed" — an unknown prerequisite
-     * keeps a task blocked rather than silently unblocking it.
+     * Status lookup for a task id. An unknown id (e.g. a dangling prerequisite) returns null and
+     * is treated as "not completed", keeping the task blocked rather than silently unblocking it.
      */
     fun interface StatusLookup {
         fun statusOf(id: TaskId): TaskStatus?
     }
 
-    /** True if [task] can be worked on right now: it is OPEN and nothing still blocks it. */
+    /** True if [task] is OPEN and nothing still blocks it. */
     fun isActionable(task: Task, graph: DependencyGraph, status: StatusLookup): Boolean {
         if (task.status != TaskStatus.OPEN) return false
         return graph.prerequisitesOf(task.id).all { status.statusOf(it) == TaskStatus.COMPLETED }
     }
 
-    /**
-     * The prerequisites of [task] that are NOT yet completed — i.e. exactly the tasks still
-     * blocking it. Empty list means the task is unblocked.
-     */
+    /** Prerequisites of [task] not yet completed; empty means unblocked. */
     fun blockedBy(task: Task, graph: DependencyGraph, status: StatusLookup): List<TaskId> =
         graph.prerequisitesOf(task.id)
             .filter { status.statusOf(it) != TaskStatus.COMPLETED }

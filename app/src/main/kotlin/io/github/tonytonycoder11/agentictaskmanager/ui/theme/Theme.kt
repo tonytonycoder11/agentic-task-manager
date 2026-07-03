@@ -8,9 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
 
-/**
- * Soft, rounded shapes to match the calm "Warm Paper" look (cards 14dp, chips 8dp).
- */
+/** Rounded shapes for the "Warm Paper" look (cards 14dp, chips 8dp). */
 private val AtmShapes = Shapes(
     extraSmall = RoundedCornerShape(6.dp),
     small = RoundedCornerShape(8.dp),
@@ -20,9 +18,8 @@ private val AtmShapes = Shapes(
 )
 
 /**
- * The app theme. We deliberately use our own bespoke light/dark schemes (not Material You dynamic
- * colour) so the calm ivory identity is consistent on every device, and expose the semantic
- * [StatusColors] through [LocalStatusColors].
+ * The app theme. Uses bespoke light/dark schemes (not Material You dynamic colour) for a consistent
+ * identity, and exposes the semantic [StatusColors] through [LocalStatusColors].
  */
 @Composable
 fun AtmTheme(

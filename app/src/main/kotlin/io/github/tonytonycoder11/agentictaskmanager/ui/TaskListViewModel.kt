@@ -28,12 +28,11 @@ import java.time.Instant
 import javax.inject.Inject
 
 /**
- * Drives the single Compose screen.
+ * Drives the single Compose screen, adapting domain results into UI rows and user-facing messages.
  *
- * Clean-architecture boundary: this presentation-layer class depends ONLY on domain use cases —
- * never on the repository, Room, or the graph internals. The live board comes from
- * [ObserveTaskBoardUseCase]; every mutation goes through an action use case. The ViewModel's only
- * job is to adapt domain results into UI rows and user-facing messages.
+ * Clean-architecture boundary: depends ONLY on domain use cases, never on the repository, Room, or
+ * graph internals. The live board comes from [ObserveTaskBoardUseCase]; every mutation goes through
+ * an action use case.
  */
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
@@ -57,8 +56,7 @@ class TaskListViewModel @Inject constructor(
     private val pendingDeletionState = MutableStateFlow<PendingDeletion?>(null)
     val pendingDeletion: StateFlow<PendingDeletion?> = pendingDeletionState.asStateFlow()
 
-    // One-shot messages surfaced to the UI as a snackbar. UNLIMITED so a burst of results (e.g.
-    // several quick actions) is never silently dropped while the single collector shows each one.
+    // One-shot snackbar messages; UNLIMITED so a burst of results is never silently dropped.
     private val messages = Channel<String>(Channel.UNLIMITED)
     val messageFlow: Flow<String> = messages.receiveAsFlow()
 
@@ -76,7 +74,7 @@ class TaskListViewModel @Inject constructor(
 
     fun onAddDependency(dependentId: TaskId, prerequisiteId: TaskId) {
         viewModelScope.launch {
-            // The result message includes the cycle rejection, which is the interesting demo case.
+            // The result message carries the cycle-rejection outcome.
             val result = addDependency(dependentId, prerequisiteId)
             messages.trySend(result.message)
         }

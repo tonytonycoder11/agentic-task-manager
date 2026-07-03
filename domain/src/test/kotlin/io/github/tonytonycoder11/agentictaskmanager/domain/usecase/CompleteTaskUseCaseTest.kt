@@ -35,7 +35,7 @@ class CompleteTaskUseCaseTest {
 
     @Test
     fun `completing the last blocker makes the dependent newly actionable`() = runTest {
-        // B depends on A; B is blocked until A is done.
+        // B depends on A.
         val repo = FakeTaskRepository(
             initialTasks = listOf(task("A"), task("B")),
             initialEdges = listOf(DependencyEdge(TaskId("B"), TaskId("A"))),
@@ -48,7 +48,7 @@ class CompleteTaskUseCaseTest {
 
     @Test
     fun `a dependent with another open blocker does NOT become actionable`() = runTest {
-        // C depends on both A and B. Completing only A leaves C still blocked by B.
+        // C depends on both A and B; completing only A leaves it blocked by B.
         val repo = FakeTaskRepository(
             initialTasks = listOf(task("A"), task("B"), task("C")),
             initialEdges = listOf(
@@ -85,7 +85,7 @@ class CompleteTaskUseCaseTest {
         assertEquals(TaskStatus.OPEN, spawned.status)
         assertEquals(Recurrence.DAILY, spawned.recurrence)
         assertEquals(due.plus(1, ChronoUnit.DAYS), spawned.dueAt)
-        // Original (completed) + new occurrence both present.
+        // Completed original plus the new occurrence.
         assertEquals(2, repo.getAllTasks().size)
     }
 
@@ -117,7 +117,7 @@ class CompleteTaskUseCaseTest {
 
     @Test
     fun `monthly recurrence clamps month-end dates (Jan 31 to Feb 28)`() = runTest {
-        // java.time plusMonths clamps Jan 31 -> Feb 28 (2026 is not a leap year). Locking this in.
+        // plusMonths clamps Jan 31 -> Feb 28 (2026 is not a leap year).
         val due = Instant.parse("2026-01-31T12:00:00Z")
         val repo = FakeTaskRepository(
             initialTasks = listOf(task("A", dueAt = due, recurrence = Recurrence.MONTHLY)),
@@ -146,12 +146,12 @@ class CompleteTaskUseCaseTest {
         )
         val completeTask = useCase(repo)
 
-        completeTask(TaskId("A")) // first completion spawns one occurrence -> 2 tasks
-        val second = completeTask(TaskId("A")) // must NOT spawn another
+        completeTask(TaskId("A")) // first completion spawns one occurrence
+        val second = completeTask(TaskId("A")) // re-completing must not spawn another
 
         assertNull(second.spawnedRecurrence)
         assertTrue(second.newlyActionable.isEmpty())
-        assertEquals(2, repo.getAllTasks().size) // still 2, not 3
+        assertEquals(2, repo.getAllTasks().size)
     }
 
     @Test

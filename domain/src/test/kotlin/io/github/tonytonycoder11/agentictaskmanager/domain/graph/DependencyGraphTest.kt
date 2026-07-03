@@ -7,10 +7,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Tests for the cycle-detection / reachability core. Edge convention: `dependent -> prerequisite`.
- * Throughout, the chain C -> B -> A means "C depends on B depends on A".
- */
+/** Cycle-detection / reachability core. Edge convention: `dependent -> prerequisite`. */
 class DependencyGraphTest {
 
     private fun id(v: String) = TaskId(v)
@@ -38,7 +35,7 @@ class DependencyGraphTest {
 
     @Test
     fun `wouldCreateCycle rejects a direct back-edge`() {
-        // B depends on A. Adding "A depends on B" closes a 2-cycle.
+        // Adding "A depends on B" closes a 2-cycle.
         val graph = DependencyGraph.of(listOf(edge("B", "A")))
 
         assertTrue(graph.wouldCreateCycle(dependent = id("A"), prerequisite = id("B")))
@@ -46,7 +43,7 @@ class DependencyGraphTest {
 
     @Test
     fun `wouldCreateCycle rejects a transitive back-edge`() {
-        // C -> B -> A. Adding "A depends on C" closes a 3-cycle.
+        // Adding "A depends on C" closes a 3-cycle.
         val graph = DependencyGraph.of(listOf(edge("C", "B"), edge("B", "A")))
 
         assertTrue(graph.wouldCreateCycle(dependent = id("A"), prerequisite = id("C")))
@@ -63,7 +60,6 @@ class DependencyGraphTest {
     fun `wouldCreateCycle allows an edge that keeps the graph acyclic`() {
         val graph = DependencyGraph.of(listOf(edge("B", "A")))
 
-        // "C depends on A" introduces no cycle.
         assertFalse(graph.wouldCreateCycle(dependent = id("C"), prerequisite = id("A")))
     }
 
@@ -76,8 +72,7 @@ class DependencyGraphTest {
 
     @Test
     fun `hasCycle detects a cycle built from raw edges`() {
-        // Two opposing edges form A -> B -> A. (The guards normally prevent this; hasCycle is
-        // the defensive integrity check for data loaded straight from storage.)
+        // Two opposing edges form a cycle; hasCycle is the integrity check for data loaded from storage.
         val graph = DependencyGraph.of(listOf(edge("A", "B"), edge("B", "A")))
 
         assertTrue(graph.hasCycle())

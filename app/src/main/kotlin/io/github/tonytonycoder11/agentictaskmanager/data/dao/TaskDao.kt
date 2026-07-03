@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
 
-    /** Reactive stream of all tasks; re-emits whenever the table changes. */
     @Query("SELECT * FROM tasks")
     fun observeAll(): Flow<List<TaskEntity>>
 

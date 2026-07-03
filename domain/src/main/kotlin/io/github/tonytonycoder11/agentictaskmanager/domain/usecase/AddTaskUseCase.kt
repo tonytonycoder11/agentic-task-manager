@@ -13,12 +13,10 @@ import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 
 /**
- * Input for [AddTaskUseCase], expressed in pure domain types.
- *
- * Dependencies can be requested two ways, mirroring how an agent will call this in Phase 2:
- *  - [dependsOnTaskIds] — exact ids the caller already knows; and
- *  - [dependsOnTitles] — natural-language titles ("the slides task") that this use case
- *    resolves to ids by best match. Whatever cannot be resolved is reported back, never guessed.
+ * Input for [AddTaskUseCase]. Dependencies can be requested two ways:
+ *  - [dependsOnTaskIds] — exact ids the caller already knows;
+ *  - [dependsOnTitles] — natural-language titles resolved to ids by best match; whatever cannot
+ *    be resolved is reported back, never guessed.
  */
 data class AddTaskCommand(
     val title: String,
@@ -37,10 +35,9 @@ data class AddTaskCommand(
  * @property createdTask the task that was persisted.
  * @property linkedPrerequisites prerequisite ids that were successfully attached.
  * @property unresolvedDependencyTitles titles that matched zero or more-than-one task and so
- *   were left unlinked (the caller — or agent — should disambiguate and retry).
+ *   were left unlinked; the caller should disambiguate and retry.
  * @property rejectedAsCycle prerequisite ids skipped because linking them would have created a
- *   cycle. For a brand-new task this is normally empty (a new task has no dependents yet), but
- *   it is reported for completeness.
+ *   cycle. Normally empty for a brand-new task, which has no dependents yet.
  */
 data class AddTaskResult(
     val createdTask: Task,
@@ -50,15 +47,12 @@ data class AddTaskResult(
 )
 
 /**
- * Creates a task and, optionally, links the tasks it depends on.
+ * Creates a task and, optionally, links the tasks it depends on. Resolves titles, guards every
+ * prospective dependency against cycles and unknown ids, persists the task and accepted edges,
+ * then reports exactly what it did and did not do.
  *
- * Thin and deterministic: it resolves titles, guards every prospective dependency against
- * cycles and against unknown ids, persists the task and the accepted edges, then reports
- * exactly what it did and did not do.
- *
- * The whole create-and-link operation runs under the shared [mutationLock] so it cannot interleave
- * with other write use cases (all writes share one lock instance); this keeps the dependency graph
- * acyclic even under concurrent callers (UI taps today, agent calls in Phase 2).
+ * Runs under the shared [mutationLock] so it cannot interleave with other write use cases, keeping
+ * the dependency graph acyclic under concurrent callers.
  */
 class AddTaskUseCase(
     private val repository: TaskRepository,
@@ -68,12 +62,9 @@ class AddTaskUseCase(
     suspend operator fun invoke(command: AddTaskCommand): AddTaskResult = mutationLock.withLock {
         val existingTasks = repository.getAllTasks()
 
-        // 1. Resolve any natural-language titles to concrete ids (or report them unresolved).
         val (resolvedFromTitles, unresolvedTitles) =
             resolveTitles(command.dependsOnTitles, existingTasks)
 
-        // 2. Build the candidate prerequisite set: explicit ids + resolved titles, de-duplicated,
-        //    keeping only ids that actually exist.
         val existingIds = existingTasks.mapTo(HashSet()) { it.id }
         val candidatePrerequisites = (command.dependsOnTaskIds + resolvedFromTitles)
             .distinct()
@@ -89,8 +80,8 @@ class AddTaskUseCase(
             parentId = command.parentId?.takeIf { it in existingIds },
         )
 
-        // 3. Persist the task first so it becomes a real node, then add edges one by one,
-        //    re-checking the cycle guard against the edges accepted so far.
+        // Persist the task first so it is a real node, then add edges one by one, re-checking the
+        // cycle guard against the edges accepted so far.
         repository.insertTask(newTask)
 
         val workingEdges = repository.getAllDependencies().toMutableList()
@@ -122,8 +113,8 @@ class AddTaskUseCase(
      *  2. otherwise a unique case-insensitive substring match wins;
      *  3. anything matching zero tasks or more than one is returned as unresolved.
      *
-     * The use case never picks arbitrarily among ambiguous matches — surfacing the ambiguity is
-     * the safe behaviour for an agent-facing API.
+     * Ambiguous matches are never resolved arbitrarily; surfacing the ambiguity is the safe
+     * behaviour for an agent-facing API.
      */
     private fun resolveTitles(
         titles: List<String>,

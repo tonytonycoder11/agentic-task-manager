@@ -14,9 +14,8 @@ import javax.inject.Inject
 /**
  * Application entry point and Hilt root.
  *
- * It also implements [AppFunctionConfiguration.Provider]: because the @AppFunction classes have
- * constructor dependencies (the domain use cases), the system can't instantiate them itself, so we
- * provide a factory that hands it the Hilt-built instances. This is the Hilt <-> AppFunctions bridge.
+ * Bridges Hilt and AppFunctions: since the @AppFunction classes take constructor dependencies, the
+ * system can't instantiate them, so [appFunctionConfiguration] hands it the Hilt-built instances.
  */
 @HiltAndroidApp
 class AtmApplication : Application(), AppFunctionConfiguration.Provider {
@@ -28,7 +27,6 @@ class AtmApplication : Application(), AppFunctionConfiguration.Provider {
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
-    // Built by Hilt with all their use-case dependencies; the factory below hands them to the system.
     @Inject
     lateinit var taskQueryFunctions: TaskQueryFunctions
 

@@ -78,11 +78,8 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
 import io.github.tonytonycoder11.agentictaskmanager.ui.theme.LocalStatusColors
 
 /**
- * The whole UI: a calm, light list of tasks plus three dialogs that exercise the domain — add a
- * task (with prerequisites), link two existing tasks (which can be rejected as a cycle), and
- * delete a task (two-step confirmation). The visual language is "Warm Paper": hairline-bordered
- * cards on an ivory background, soft pastel status pills, a thin priority accent — no heavy
- * shadows or strong colours.
+ * The whole UI: the task list plus three dialogs — add a task (with prerequisites), link two tasks
+ * (a cycle is rejected), and delete a task (two-step confirmation).
  */
 @Composable
 fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
@@ -96,8 +93,7 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
 
     var showAddTask by remember { mutableStateOf(false) }
     var showAddDependency by remember { mutableStateOf(false) }
-    // Optional recurrence filter: null = all cadences; otherwise show only that cadence
-    // (Recurrence.NONE = one-time tasks).
+    // null = all cadences; Recurrence.NONE = one-time tasks.
     var recurrenceFilter by remember { mutableStateOf<Recurrence?>(null) }
 
     Scaffold(
@@ -114,8 +110,7 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
             }
         },
     ) { padding ->
-        // Apply the recurrence filter, then partition the (already urgency-sorted) rows into the
-        // three status sections. Order within each list is preserved — we only split, never re-sort.
+        // Partition the already-sorted rows into status sections; we split, never re-sort.
         val visibleRows = state.rows.filter { recurrenceFilter == null || it.recurrence == recurrenceFilter }
         val actionableRows = visibleRows.filter { it.status == TaskStatus.OPEN && it.isActionable }
         val blockedRows = visibleRows.filter { it.status == TaskStatus.OPEN && !it.isActionable }
@@ -150,9 +145,6 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
                     }
                 }
             } else {
-                // Each section renders a labelled header + its cards, and is skipped entirely
-                // (header included) when it holds no tasks. Sections are separated by extra
-                // top spacing on the header for a calm, clearly grouped layout.
                 taskSection(
                     label = "Actionable",
                     rows = actionableRows,
@@ -214,9 +206,8 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
 }
 
 /**
- * Adds one labelled section (header row + its task cards) to a [LazyColumn]. Renders nothing at
- * all — header included — when [rows] is empty, so empty sections simply disappear. When [dimmed]
- * is true (the "Completed" group) the cards are slightly faded so they read as de-emphasised.
+ * Adds one labelled section (header + task cards) to a [LazyColumn]; renders nothing, header
+ * included, when [rows] is empty. [dimmed] fades the cards (used for the "Completed" group).
  */
 private fun LazyListScope.taskSection(
     label: String,
@@ -239,11 +230,7 @@ private fun LazyListScope.taskSection(
     }
 }
 
-/**
- * Quiet section divider: an uppercased label with the section's task count
- * (e.g. "ACTIONABLE · 4"). Uses onSurfaceVariant so it whispers rather than shouts, and adds
- * generous top padding to set each group apart without resorting to lines or shadows.
- */
+/** Section divider: an uppercased label with its task count, e.g. "ACTIONABLE · 4". */
 @Composable
 private fun SectionHeader(label: String, count: Int) {
     Text(
@@ -329,8 +316,6 @@ private fun TaskCard(
     dimmed: Boolean = false,
 ) {
     val completed = row.status == TaskStatus.COMPLETED
-    // De-emphasise completed cards by gently fading the whole card, keeping the same calm
-    // hairline-bordered surface (no new colours, no shadows).
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
@@ -338,7 +323,7 @@ private fun TaskCard(
         modifier = if (dimmed) Modifier.alpha(0.6f) else Modifier,
     ) {
         Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-            // Thin leading priority accent — colours only a 3dp bar, never the whole card.
+            // Leading priority accent bar.
             Box(
                 modifier = Modifier
                     .padding(start = 4.dp, top = 12.dp, bottom = 12.dp)
@@ -541,11 +526,7 @@ private fun EmptyState(
     }
 }
 
-/**
- * Horizontally scrollable chip row to filter the list by recurrence cadence. "All" clears the
- * filter; each other chip shows only tasks of that cadence (One-time = non-recurring). This gives a
- * clear by-cadence division on demand without a second, conflicting grouping axis in the list.
- */
+/** Scrollable chip row to filter the list by recurrence cadence; "All" clears the filter. */
 @Composable
 private fun RecurrenceFilterRow(selected: Recurrence?, onSelect: (Recurrence?) -> Unit) {
     val options: List<Pair<String, Recurrence?>> = listOf(
@@ -573,7 +554,6 @@ private fun RecurrenceFilterRow(selected: Recurrence?, onSelect: (Recurrence?) -
     }
 }
 
-/** "URGENT" -> "Urgent", "WEEKLY" -> "Weekly", etc. */
 private fun Priority.label(): String = name.lowercase().replaceFirstChar { it.uppercase() }
 
 private fun Recurrence.label(): String = name.lowercase().replaceFirstChar { it.uppercase() }
@@ -588,8 +568,6 @@ private fun priorityColor(priority: Priority): Color {
         Priority.LOW -> s.priorityLow
     }
 }
-
-// ----- Dialogs (functionally unchanged; they pick up the theme's shapes and colours) -----
 
 @Composable
 private fun AddTaskDialog(

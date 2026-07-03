@@ -6,11 +6,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * "Warm Paper" — a light, calm, ivory palette: warm-gray ink on layered off-white surfaces,
- * separated by hairlines instead of shadows, with a single muted clay accent used sparingly.
- * Deliberately low-chroma and near-white (no strong/saturated colours), in the spirit of
- * Things / Linear / Notion. A bespoke scheme (not system dynamic colour) keeps the identity
- * consistent. Status colours are gentle earth/sage/slate tones the Material roles don't provide.
+ * "Warm Paper": a low-chroma ivory palette. Bespoke rather than system dynamic colour so the
+ * identity stays consistent across devices.
  */
 
 private val LightScheme = lightColorScheme(
@@ -87,9 +84,8 @@ internal val AtmLightColors = LightScheme
 internal val AtmDarkColors = DarkScheme
 
 /**
- * Gentle semantic colours for task status and priority. Pills use the *Container* tone as a soft
- * pastel fill with the matching colour as the label; tones without a container are rendered as
- * text (optionally over a faint tint), never as a saturated filled block.
+ * Semantic colours for task status and priority. Pills fill with the *Container* tone and label
+ * with the matching colour; tones without a container are rendered as text, not a filled block.
  */
 data class StatusColors(
     val actionable: Color,

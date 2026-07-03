@@ -7,9 +7,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 /**
- * A restrained type scale for a clean, minimal app: the system font, intentional weights, and
- * slightly tightened letter spacing. Low size contrast keeps the screen calm — the emphasis comes
- * from weight and colour, not from large headings.
+ * A restrained type scale on the system font. Low size contrast keeps emphasis on weight and
+ * colour rather than large headings.
  */
 private val Default = FontFamily.Default
 

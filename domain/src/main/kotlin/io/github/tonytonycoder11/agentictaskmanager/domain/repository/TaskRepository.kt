@@ -8,20 +8,15 @@ import kotlinx.coroutines.flow.Flow
 /**
  * The persistence boundary, expressed in domain terms only.
  *
- * Declared here in `:domain` but implemented in `:app/data` (Room). The domain therefore knows
- * nothing about Room, SQLite or Android — it only knows it can read and write [Task]s and
- * [DependencyEdge]s. This is the seam that lets the whole domain be unit-tested against a
- * trivial in-memory fake.
- *
- * The `observe*` methods return cold [Flow]s for the reactive UI; the `suspend` methods are
- * one-shot reads/writes used by the use cases.
+ * Declared in `:domain` but implemented in `:app/data` (Room), keeping the domain free of Room,
+ * SQLite and Android and unit-testable against an in-memory fake.
  */
 interface TaskRepository {
 
-    /** Emits the full task list and re-emits on every change. */
+    /** Re-emits the full task list on every change. */
     fun observeTasks(): Flow<List<Task>>
 
-    /** Emits the full dependency edge list and re-emits on every change. */
+    /** Re-emits the full dependency edge list on every change. */
     fun observeDependencies(): Flow<List<DependencyEdge>>
 
     suspend fun getAllTasks(): List<Task>
@@ -34,11 +29,7 @@ interface TaskRepository {
 
     suspend fun updateTask(task: Task)
 
-    /**
-     * Deletes a single task. Implementations MUST also remove any dependency edge that
-     * references it (the Room implementation relies on an ON DELETE CASCADE foreign key), so
-     * that deleting a task can never leave a dangling edge behind.
-     */
+    /** Deletes a task; implementations MUST also remove any edge referencing it (no dangling edges). */
     suspend fun deleteTask(id: TaskId)
 
     suspend fun addDependency(edge: DependencyEdge)

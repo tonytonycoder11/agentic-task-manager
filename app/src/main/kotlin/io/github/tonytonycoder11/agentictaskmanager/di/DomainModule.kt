@@ -23,9 +23,8 @@ import java.time.Clock
 import javax.inject.Singleton
 
 /**
- * Provides the domain building blocks. The use cases live in the pure-Kotlin `:domain` module and
- * therefore have NO Hilt annotations of their own; we construct them here with @Provides. This is
- * what keeps the domain free of any DI-framework dependency.
+ * Provides the domain building blocks. Use cases carry no Hilt annotations, keeping the pure-Kotlin
+ * `:domain` module free of any DI-framework dependency; they are constructed here with @Provides.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,9 +45,8 @@ object DomainModule {
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /**
-     * A single, app-wide lock shared by every write use case. Because all mutations take this same
-     * lock, their read-check-write sequences are serialized, which is what actually preserves the
-     * acyclicity invariant under concurrent callers (UI today, agent calls in Phase 2).
+     * A single app-wide lock shared by every write use case, serializing their read-check-write
+     * sequences so the acyclicity invariant holds under concurrent callers.
      */
     @Provides
     @Singleton

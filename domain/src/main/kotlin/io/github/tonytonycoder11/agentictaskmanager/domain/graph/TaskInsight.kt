@@ -5,16 +5,12 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
 
 /**
- * A read-model that pairs a [Task] with the graph-derived facts about it.
+ * A read-model pairing a [Task] with the graph-derived facts about it, so actionability is
+ * computed in exactly one place for every consumer (UI, query use cases, agent DTO mappers).
  *
- * This is the single projection consumed by everything that needs to *show* tasks: the
- * Compose UI, the query use cases, and (from Phase 2) the agent DTO mappers. Centralising it
- * here means actionability is computed in exactly one place.
- *
- * @property task the underlying task.
  * @property isActionable whether it can be started right now (OPEN + all prerequisites done).
- * @property blockedBy ids of the prerequisites still blocking it (empty if unblocked).
- * @property blocks ids of the tasks that directly depend on it (the tasks it is holding up).
+ * @property blockedBy prerequisites still blocking it (empty if unblocked).
+ * @property blocks tasks that directly depend on it.
  */
 data class TaskInsight(
     val task: Task,
@@ -27,9 +23,8 @@ data class TaskInsight(
 object TaskInsights {
 
     /**
-     * Computes a [TaskInsight] for every task in [tasks], using [edges] for the relationships.
-     * The status lookup is backed by the tasks themselves, so completing a task and re-running
-     * this immediately reflects the new actionability of its dependents.
+     * A [TaskInsight] for every task in [tasks], with relationships from [edges]. Status is read
+     * from [tasks] themselves, so re-running after a completion reflects dependents' new state.
      */
     fun computeAll(
         tasks: List<Task>,

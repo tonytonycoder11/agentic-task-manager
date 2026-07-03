@@ -1,15 +1,10 @@
 package io.github.tonytonycoder11.agentictaskmanager.domain.model
 
 /**
- * A directed dependency between two tasks.
+ * A directed dependency: [dependentId] depends on [prerequisiteId], i.e. the dependent cannot
+ * start until the prerequisite is completed.
  *
- * Read it as: **[dependentId] depends on [prerequisiteId]** — equivalently,
- * "[prerequisiteId] blocks [dependentId]". The dependent cannot be started until the
- * prerequisite is completed.
- *
- * The full set of edges forms a directed graph that MUST remain acyclic (a DAG): if it had a
- * cycle, a group of tasks would block each other forever and none could ever become
- * actionable. Cycle prevention lives in
+ * Edges must form a DAG — a cycle would block a group of tasks forever. Cycle prevention lives in
  * [DependencyGraph][io.github.tonytonycoder11.agentictaskmanager.domain.graph.DependencyGraph].
  */
 data class DependencyEdge(

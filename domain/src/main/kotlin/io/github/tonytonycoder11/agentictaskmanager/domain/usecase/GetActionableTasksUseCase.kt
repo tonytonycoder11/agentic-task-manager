@@ -6,10 +6,7 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.repository.TaskReposi
 
 /**
  * Returns the tasks the user can work on right now: OPEN tasks whose every dependency is already
- * completed (nothing is blocking them), ordered by urgency.
- *
- * This is the canonical "rich, read-only graph query" of the project — the one an agent will be
- * asked for as "what can I do now / what's unblocked / what should I focus on".
+ * completed, ordered by urgency.
  */
 class GetActionableTasksUseCase(
     private val repository: TaskRepository,

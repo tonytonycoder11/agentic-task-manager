@@ -12,13 +12,12 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 /**
- * Translation between the agent DTOs and domain types, plus tolerant parsing of agent-supplied
- * strings. Agents pass imperfect input, so parsing is forgiving where it safely can be (enums are
- * case-insensitive and fall back to a default) and explicit where it cannot (an unparseable date or
- * a blank id is reported as an [AppFunctionInvalidArgumentException] rather than silently mishandled).
+ * Translation between agent DTOs and domain types, plus tolerant parsing of agent-supplied strings.
+ * Parsing is forgiving where it safely can be (enums fall back to a default) and explicit where it
+ * cannot (a bad date or blank id raises [AppFunctionInvalidArgumentException] rather than mishandling).
  */
 
-/** Rich mapping from a graph insight (the normal path for query results). */
+/** Rich mapping from a graph insight; the normal path for query results. */
 fun TaskInsight.toDto(): TaskDto = TaskDto(
     id = task.id.value,
     title = task.title,
@@ -31,10 +30,7 @@ fun TaskInsight.toDto(): TaskDto = TaskDto(
     blocksTaskIds = blocks.map { it.value },
 )
 
-/**
- * Mapping from a bare [Task] when the actionability is already known by the caller (e.g. a just
- * completed task is not actionable; a freshly unblocked task is).
- */
+/** Mapping from a bare [Task] when the caller already knows its actionability. */
 fun Task.toDto(
     isActionable: Boolean,
     blockedBy: List<TaskId> = emptyList(),
@@ -66,9 +62,8 @@ fun String?.toRecurrenceOrDefault(): Recurrence =
     this?.trim()?.uppercase()?.let { runCatching { Recurrence.valueOf(it) }.getOrNull() } ?: Recurrence.NONE
 
 /**
- * Parses an optional due date. Accepts a full ISO-8601 instant ("2026-07-01T09:00:00Z") or a plain
- * ISO date ("2026-07-01", interpreted as start of day UTC). Null stays null; anything else is an
- * invalid argument the agent should correct.
+ * Parses an optional due date: an ISO-8601 instant, or a plain ISO date taken as start of day UTC.
+ * Null stays null; anything else is an invalid argument.
  */
 fun parseDueDate(value: String?): Instant? {
     val raw = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null

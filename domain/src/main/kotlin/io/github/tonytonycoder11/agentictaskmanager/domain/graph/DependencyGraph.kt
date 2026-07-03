@@ -4,25 +4,17 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.DependencyEdge
 import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskId
 
 /**
- * An immutable view over the task dependency relationships.
- *
- * Built once from a flat list of [DependencyEdge]s, it answers the graph questions the rest
- * of the domain needs:
- *  - who blocks whom ([prerequisitesOf] / [dependentsOf]),
- *  - reachability ([dependsOn]),
- *  - and — the whole reason this graph exists — whether adding a new edge would introduce a
- *    cycle ([wouldCreateCycle]) and whether the graph is currently a DAG ([hasCycle]).
+ * An immutable, side-effect-free view over the task dependency relationships, built once from a
+ * flat list of [DependencyEdge]s.
  *
  * Edge direction convention (see [DependencyEdge]): an edge goes
- * `dependent --depends-on--> prerequisite`. So "following dependencies" means walking from a
- * task to its prerequisites.
- *
- * This class is pure and side-effect free; it is the most unit-tested unit in the project.
+ * `dependent --depends-on--> prerequisite`, so "following dependencies" walks from a task to its
+ * prerequisites.
  */
 class DependencyGraph private constructor(
-    /** task -> the set of tasks it directly depends on (its prerequisites). */
+    /** task -> its direct prerequisites. */
     private val prerequisites: Map<TaskId, Set<TaskId>>,
-    /** task -> the set of tasks that directly depend on it (the tasks it blocks). */
+    /** task -> the tasks that directly depend on it. */
     private val dependents: Map<TaskId, Set<TaskId>>,
 ) {
 
@@ -33,12 +25,9 @@ class DependencyGraph private constructor(
     fun dependentsOf(id: TaskId): Set<TaskId> = dependents[id].orEmpty()
 
     /**
-     * True if [from] transitively depends on [to] — i.e. there is a directed path
-     * `from --depends-on--> ... --depends-on--> to`. A node never "depends on" itself here
-     * (an empty path is not a dependency).
+     * True if [from] transitively depends on [to]. A node never depends on itself.
      *
-     * Implemented as an iterative depth-first search over [prerequisitesOf] so it is safe for
-     * deep chains without risking a stack overflow.
+     * Iterative DFS so deep chains can't overflow the stack.
      */
     fun dependsOn(from: TaskId, to: TaskId): Boolean {
         if (from == to) return false
@@ -56,25 +45,19 @@ class DependencyGraph private constructor(
     }
 
     /**
-     * Would adding the edge "[dependent] depends on [prerequisite]" create a cycle?
+     * Would adding "[dependent] depends on [prerequisite]" create a cycle — either a self-edge, or
+     * because [prerequisite] already transitively depends on [dependent]?
      *
-     * Two ways that can happen:
-     *  1. a self-edge ([dependent] == [prerequisite]); or
-     *  2. [prerequisite] already (transitively) depends on [dependent], so the new edge would
-     *     close the loop `dependent -> prerequisite -> ... -> dependent`.
-     *
-     * Callers use this as a guard BEFORE persisting a new dependency, which is what keeps the
-     * stored graph a DAG at all times.
+     * Use as a guard before persisting a dependency; this is what keeps the stored graph a DAG.
      */
     fun wouldCreateCycle(dependent: TaskId, prerequisite: TaskId): Boolean =
         dependent == prerequisite || dependsOn(from = prerequisite, to = dependent)
 
     /**
-     * True if the current graph already contains a cycle. Used as a defensive integrity check
-     * when loading edges from storage (which the in-app guards should never allow to happen).
+     * True if the graph already contains a cycle. Defensive integrity check when loading edges
+     * from storage; the in-app guards should never let this happen.
      *
-     * Standard three-colour DFS: a node painted GRAY is on the current recursion path; meeting
-     * a GRAY node again means a back-edge, i.e. a cycle.
+     * Three-colour DFS: a GRAY node is on the current path, so meeting one again is a back-edge.
      */
     fun hasCycle(): Boolean {
         val color = HashMap<TaskId, Color>()
@@ -88,8 +71,6 @@ class DependencyGraph private constructor(
     private enum class Color { GRAY, BLACK }
 
     private fun dfsHasCycle(start: TaskId, color: MutableMap<TaskId, Color>): Boolean {
-        // Iterative DFS that mirrors the recursive white/gray/black algorithm.
-        // Each stack frame remembers which prerequisites are still to be explored.
         val frames = ArrayDeque<Frame>()
         color[start] = Color.GRAY
         frames.addLast(Frame(start, prerequisitesOf(start).iterator()))
@@ -98,8 +79,8 @@ class DependencyGraph private constructor(
             if (frame.children.hasNext()) {
                 val next = frame.children.next()
                 when (color[next]) {
-                    Color.GRAY -> return true // back-edge to a node on the current path
-                    Color.BLACK -> Unit // already fully explored, skip
+                    Color.GRAY -> return true // back-edge: cycle
+                    Color.BLACK -> Unit
                     null -> {
                         color[next] = Color.GRAY
                         frames.addLast(Frame(next, prerequisitesOf(next).iterator()))

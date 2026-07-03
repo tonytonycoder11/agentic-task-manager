@@ -20,7 +20,7 @@ class QueryUseCasesTest {
 
     @Test
     fun `getActionableTasks returns only unblocked open tasks, ordered by urgency`() = runTest {
-        // A (done) blocks B. C is free. D is done. Expect actionable = [C (high), B (medium)].
+        // A (done) blocks B; C free; D done. Expected: C (high) before B (medium).
         val repo = FakeTaskRepository(
             initialTasks = listOf(
                 task("A", status = TaskStatus.COMPLETED),
@@ -38,9 +38,7 @@ class QueryUseCasesTest {
 
     @Test
     fun `getBlockingOverdue returns overdue tasks that block an open task`() = runTest {
-        // A is overdue and blocks B (open) -> included.
-        // C is overdue but blocks nobody -> excluded.
-        // D blocks E (open) but is not overdue -> excluded.
+        // Included only if overdue AND blocking an open task: A qualifies; C (blocks nobody) and D (not overdue) don't.
         val repo = FakeTaskRepository(
             initialTasks = listOf(
                 task("A", dueAt = yesterday),
@@ -62,7 +60,7 @@ class QueryUseCasesTest {
 
     @Test
     fun `getBlockingOverdue excludes an overdue task whose dependents are all completed`() = runTest {
-        // A is overdue and blocks B, but B is already completed -> A is no longer "holding up" work.
+        // A is overdue but its only dependent B is completed, so A is no longer holding up work.
         val repo = FakeTaskRepository(
             initialTasks = listOf(
                 task("A", dueAt = yesterday),

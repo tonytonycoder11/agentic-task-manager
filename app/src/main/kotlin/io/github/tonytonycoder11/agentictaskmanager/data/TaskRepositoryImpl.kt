@@ -14,11 +14,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Room-backed implementation of the domain [TaskRepository].
- *
- * It is the only place that knows about Room. Every method maps between entities and domain
- * models so the domain stays Android-free. Deleting a task relies on the ON DELETE CASCADE
- * foreign keys to drop its dependency edges, honouring the repository contract.
+ * Room-backed [TaskRepository]; maps between entities and domain models so the domain stays
+ * Android-free. Deleting a task relies on ON DELETE CASCADE to drop its dependency edges.
  */
 @Singleton
 class TaskRepositoryImpl @Inject constructor(

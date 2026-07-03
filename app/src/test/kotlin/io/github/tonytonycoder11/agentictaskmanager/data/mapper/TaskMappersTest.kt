@@ -12,10 +12,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.Instant
 
-/**
- * Plain-JVM unit tests for the Room <-> domain mappers (no Android runtime needed: the entities
- * are ordinary data classes and the mappers only use java.time).
- */
+/** Plain-JVM tests for the Room <-> domain mappers; entities are plain data classes, so no Android runtime is needed. */
 class TaskMappersTest {
 
     @Test

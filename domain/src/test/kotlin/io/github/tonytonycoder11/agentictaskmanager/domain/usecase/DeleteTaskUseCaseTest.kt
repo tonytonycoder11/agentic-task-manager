@@ -20,7 +20,7 @@ class DeleteTaskUseCaseTest {
 
         assertEquals(DeleteOutcome.CONFIRMATION_REQUIRED, result.outcome)
         assertEquals(listOf(TaskId("A")), result.affectedTaskIds)
-        assertEquals(1, repo.getAllTasks().size) // nothing actually deleted
+        assertEquals(1, repo.getAllTasks().size)
     }
 
     @Test
@@ -35,7 +35,7 @@ class DeleteTaskUseCaseTest {
 
         assertEquals(DeleteOutcome.DELETED, result.outcome)
         assertEquals(listOf(task("B")), repo.getAllTasks())
-        assertTrue(repo.getAllDependencies().isEmpty()) // edge to A was cascaded away
+        assertTrue(repo.getAllDependencies().isEmpty())
     }
 
     @Test

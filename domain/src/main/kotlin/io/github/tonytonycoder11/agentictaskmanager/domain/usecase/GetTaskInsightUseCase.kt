@@ -7,8 +7,7 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.repository.TaskReposi
 
 /**
  * Returns the [TaskInsight] (task + actionability/blockers) for a single task id, or null if no
- * such task exists. Used by the agent layer to report a freshly created/changed task with its
- * correct, graph-derived actionability without duplicating the projection logic.
+ * such task exists.
  */
 class GetTaskInsightUseCase(
     private val repository: TaskRepository,

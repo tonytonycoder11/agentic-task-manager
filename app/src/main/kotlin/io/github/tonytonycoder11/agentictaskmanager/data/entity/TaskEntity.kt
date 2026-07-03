@@ -5,14 +5,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Room row for a task.
+ * Room row for a task. Enums and the due instant are stored as primitives (String / nullable Long
+ * epoch millis) to avoid TypeConverters; conversion lives in the mappers.
  *
- * Enums and the due instant are stored as primitives (String / nullable Long epoch millis) to
- * keep the schema simple and avoid TypeConverters in Phase 1. Conversion to/from the domain
- * [Task][io.github.tonytonycoder11.agentictaskmanager.domain.model.Task] lives in the mappers.
- *
- * [parentId] is indexed (sub-task lookups walk it) but intentionally has no foreign key: the
- * sub-task subtree deletion is owned by the domain use case, not by a DB cascade.
+ * [parentId] is indexed but intentionally has no foreign key: sub-task subtree deletion is owned
+ * by the domain use case, not by a DB cascade.
  */
 @Entity(
     tableName = "tasks",

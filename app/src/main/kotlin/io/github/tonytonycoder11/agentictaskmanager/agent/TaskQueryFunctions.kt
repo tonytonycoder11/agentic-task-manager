@@ -12,12 +12,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Read-only AppFunctions that traverse the dependency graph. These are thin adapters: each one just
- * calls the matching domain use case and maps the result to a DTO — there is no domain logic here.
- * Hilt builds this class (constructor injection); the Application's AppFunctionConfiguration hands
- * the instance to the system (see AtmApplication).
- *
- * AppFunctions run on the UI thread by default, so each one moves to [Dispatchers.IO] for the work.
+ * Read-only AppFunctions over the dependency graph. Thin adapters: each calls a domain use case and
+ * maps the result to a DTO. Hilt constructs the class; the Application's AppFunctionConfiguration
+ * hands the instance to the system. Work runs on [Dispatchers.IO], since AppFunctions dispatch on the
+ * main thread by default.
  */
 class TaskQueryFunctions @Inject constructor(
     private val getActionableTasksUseCase: GetActionableTasksUseCase,

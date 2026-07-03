@@ -10,7 +10,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-/** A deterministic [IdGenerator] producing "t1", "t2", ... so generated ids are predictable. */
+/** Deterministic [IdGenerator] producing "t1", "t2", ... for predictable ids in tests. */
 class SequentialIdGenerator(private val prefix: String = "t") : IdGenerator {
     private var counter = 0
     override fun newId(): String = "$prefix${++counter}"

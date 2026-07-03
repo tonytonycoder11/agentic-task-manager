@@ -8,11 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * In-memory [TaskRepository] for unit tests.
- *
- * It is the seam that lets the entire domain be tested without Room or Android. It also
- * faithfully emulates the documented ON DELETE CASCADE behaviour: deleting a task removes any
- * edge that references it, exactly as the Room implementation does.
+ * In-memory [TaskRepository] for unit tests, letting the domain be exercised without Room or Android.
+ * Emulates Room's ON DELETE CASCADE: deleting a task also removes any edge that references it.
  */
 class FakeTaskRepository(
     initialTasks: List<Task> = emptyList(),
@@ -42,7 +39,7 @@ class FakeTaskRepository(
 
     override suspend fun deleteTask(id: TaskId) {
         tasksFlow.value = tasksFlow.value.filterNot { it.id == id }
-        // Emulate ON DELETE CASCADE: drop edges touching the deleted task.
+        // ON DELETE CASCADE: drop edges touching the deleted task.
         edgesFlow.value = edgesFlow.value.filterNot {
             it.dependentId == id || it.prerequisiteId == id
         }

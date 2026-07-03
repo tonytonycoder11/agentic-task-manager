@@ -11,16 +11,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Seeds a small, fully SYNTHETIC scenario the first time the app runs (security rule #5: no real
- * personal data). The data is intentionally shaped to exercise every domain feature so the app —
- * and later the agent — has something interesting to reason about:
- *
- *  - "Prepare slides" and "Book venue" both block "Present at the GDG meetup" (so it is blocked);
- *  - "Book venue" is already overdue and blocking, so it surfaces in getBlockingOverdue();
- *  - "Buy milk" is free (actionable); "Water the plants" is a weekly recurring task.
- *
- * Seeding goes through the real [AddTaskUseCase] (not raw inserts), so the dependency links are
- * created and validated exactly as they would be at runtime.
+ * Seeds a small synthetic scenario on first run; the data is intentionally shaped to exercise
+ * every domain feature (dependencies, overdue, recurrence). Uses only synthetic data — no real
+ * personal data. Goes through the real [AddTaskUseCase] so dependency links are validated exactly
+ * as at runtime.
  */
 @Singleton
 class DatabaseSeeder @Inject constructor(
@@ -46,10 +40,10 @@ class DatabaseSeeder @Inject constructor(
                 title = "Book venue",
                 description = "Reserve the room for the meetup.",
                 priority = Priority.URGENT,
-                dueAt = now.minus(1, ChronoUnit.DAYS), // already overdue
+                dueAt = now.minus(1, ChronoUnit.DAYS),
             ),
         )
-        // Depends on both of the above by title -> starts blocked.
+        // Depends on both of the above, so it starts blocked.
         addTask(
             AddTaskCommand(
                 title = "Present at the GDG meetup",

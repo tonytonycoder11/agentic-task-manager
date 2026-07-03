@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Real agent loop. A natural-language instruction is sent to a model, which chooses one AppFunction
-and its arguments; that function is then executed on the running app via `adb cmd app_function`, so
-the change appears in the UI. This is the same loop the on-device Gemini assistant would run — only
-the transport is adb instead of the (EAP-gated) system assistant.
+Real agent loop. A model picks one AppFunction and its arguments for a natural-language
+instruction, and that function runs on the live app via `adb cmd app_function`, so the change
+shows in the UI. Same loop the on-device assistant would run, but over adb rather than the
+(EAP-gated) system assistant.
 
 Usage:
   GITHUB_TOKEN=$(gh auth token) python3 agent_demo.py "add a high priority task to call the plumber"
@@ -16,7 +16,7 @@ import sys
 import time
 import urllib.request
 
-from harness import declarations, to_openai_tools  # reuse the function declarations
+from harness import declarations, to_openai_tools
 
 PKG = "io.github.tonytonycoder11.agentictaskmanager"
 ADB = os.path.expanduser("~/Library/Android/sdk/platform-tools/adb")
@@ -33,8 +33,8 @@ SYSTEM = (
 
 
 def adb_shell(cmd):
-    # adb joins argv with spaces and the device shell re-parses, so the whole device command is
-    # passed as ONE string with the JSON shell-single-quoted, to survive that re-split.
+    # The device shell re-parses argv, so pass the command as one string with its JSON
+    # single-quoted to survive the re-split.
     return subprocess.run([ADB, "shell", cmd], capture_output=True, text=True).stdout
 
 

@@ -27,10 +27,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Write AppFunctions (create / complete / delete). Thin adapters over the domain use cases: they
- * parse agent input, call the use case, and map the result back — no domain logic lives here.
- * Errors are surfaced as the AppFunctions exceptions the agent understands
- * ([AppFunctionInvalidArgumentException], [AppFunctionElementNotFoundException]) rather than crashes.
+ * Write AppFunctions (create, complete, delete). Thin adapters over the domain use cases: parse agent
+ * input, call the use case, map the result back. Failures surface as AppFunctions exceptions the agent
+ * understands ([AppFunctionInvalidArgumentException], [AppFunctionElementNotFoundException]).
  */
 class TaskActionFunctions @Inject constructor(
     private val addTaskUseCase: AddTaskUseCase,
@@ -66,7 +65,7 @@ class TaskActionFunctions @Inject constructor(
             recurrence = params.recurrence.toRecurrenceOrDefault(),
         )
         val result = addTaskUseCase(command)
-        // Report the new task with its real, graph-derived actionability.
+        // Report the new task with its graph-derived actionability.
         val createdDto = getTaskInsightUseCase(result.createdTask.id)?.toDto()
             ?: result.createdTask.toDto(isActionable = false)
         AddTaskResultDto(

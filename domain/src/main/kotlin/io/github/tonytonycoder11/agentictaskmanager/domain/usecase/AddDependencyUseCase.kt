@@ -31,18 +31,13 @@ data class AddDependencyResult(
 )
 
 /**
- * Links two EXISTING tasks: makes [dependentId] depend on [prerequisiteId].
+ * Links two existing tasks: makes [dependentId] depend on [prerequisiteId].
  *
- * This is the use case where cycle detection truly earns its place — unlike adding a brand-new
- * task, linking two existing tasks can close a loop. Every rejection reason is reported as a
- * structured [AddDependencyOutcome] rather than thrown, because "you can't add that, it would
- * create a cycle" is a normal, expected answer for both the UI and an agent.
+ * Rejection reasons are reported as a structured [AddDependencyOutcome] rather than thrown.
  *
- * The read-check-write (load the graph, test [DependencyGraph.wouldCreateCycle], then persist) runs
- * under the shared [mutationLock]. That serialization is what makes the acyclicity invariant
- * actually hold: without it, two concurrent additions could each independently observe an acyclic
- * graph and both persist, together closing the very cycle the guard exists to prevent. All write
- * use cases share the same lock instance.
+ * The read-check-write runs under the shared [mutationLock]. Serializing it is what keeps the graph
+ * acyclic: without it, two concurrent additions could each observe an acyclic graph and both
+ * persist, together closing a cycle. All write use cases share the same lock instance.
  */
 class AddDependencyUseCase(
     private val repository: TaskRepository,

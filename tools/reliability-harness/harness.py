@@ -2,20 +2,11 @@
 """
 Reliability harness for the Agentic Task Manager AppFunctions.
 
-It measures how reliably a Gemini agent turns a natural-language request into the RIGHT function
-call with the RIGHT parameters — the number that tells you whether the app is genuinely
-"agent-ready", and the core of the project's distinctive write-up.
-
-For every intent in the dataset it sends Gemini:
-  - a system instruction framing it as an on-device task-manager assistant,
-  - the five functions as tool (function) declarations,
-  - a fixed snapshot of the current tasks (so id-based parameters are resolvable),
-  - the user's request,
-and records which function Gemini chose and with which arguments. It then compares that against
-the expected function/params and aggregates accuracy.
-
-It runs the whole dataset under TWO description variants — "rich" (the real KDocs) and "terse"
-(bare one-liners) — to quantify how much the quality of the KDoc/description moves accuracy.
+Measures how reliably an agent turns a natural-language request into the right function call with
+the right parameters. For each intent it sends the model a system instruction, the five functions
+as tool declarations, and a fixed task snapshot, then compares the chosen function/args against the
+expected ones and aggregates accuracy. Runs under two description variants — "rich" (the real
+KDocs) and "terse" (bare one-liners) — to quantify how much description quality moves accuracy.
 
 Usage:
   python3 harness.py --dataset dataset.json --out report.json [--model gemini-2.5-flash]
@@ -43,9 +34,8 @@ FUNCTIONS = ["getActionableTasks", "getBlockingOverdueTasks", "addTask", "comple
 class QuotaExhausted(Exception):
     """Raised to abort the run cleanly when the Gemini free-tier quota is spent."""
 
-# Minimal id<->title directory. Deliberately carries NO status / actionability / overdue / dependency
-# information: the model must CALL a function to read that state (it can't shortcut a query by reading
-# the answer from the prompt), while still being able to resolve "the slides" -> t-slides for actions.
+# Id<->title directory only. Carries no status/overdue/dependency state, so the model must call a
+# function to read it rather than answer a query straight from the prompt.
 TASK_CONTEXT = """You do not have the current task data loaded — call a function to read state.
 For reference, the ids of the known tasks are:
 - t-venue = "Book venue"
@@ -61,7 +51,7 @@ SYSTEM_INSTRUCTION = (
     "to ids using the provided current task list."
 )
 
-# --- Rich descriptions: the real KDocs (condensed). The point of the project: KDoc == the prompt. ---
+# Rich descriptions: the real KDocs, condensed.
 RICH = {
     "getActionableTasks": "Returns the tasks the user can work on right now: open tasks whose every "
         "dependency is already completed, so nothing is blocking them, ordered by urgency. Use when the "
@@ -82,7 +72,7 @@ RICH = {
         "confirmed=true once the user agrees. Do not refuse; confirmed=false is the correct first step.",
 }
 
-# --- Terse descriptions: deliberately unhelpful, to isolate the effect of description quality. ---
+# Terse descriptions: deliberately unhelpful, to isolate the effect of description quality.
 TERSE = {
     "getActionableTasks": "Get actionable tasks.",
     "getBlockingOverdueTasks": "Get blocking overdue tasks.",
@@ -91,7 +81,7 @@ TERSE = {
     "deleteTask": "Delete a task.",
 }
 
-# Field descriptions (used only in the rich variant).
+# Field descriptions; used only in the rich variant.
 FIELD_DESC = {
     "title": "Short title of the new task.",
     "description": "Optional longer description.",
@@ -155,9 +145,8 @@ def declarations(rich: bool):
 def call_gemini(model, api_key, decls, intent, sleep, max_retries=4):
     """Single generateContent call.
 
-    Returns (function_name_or_None, args_dict). Two sentinels: "__QUOTA__" when the free-tier
-    quota is exhausted (so the caller can abort the whole run instead of grinding for hours), and
-    "__ERROR__" for other failures.
+    Returns (function_name_or_None, args_dict). Sentinel names: "__QUOTA__" when the free-tier
+    quota is exhausted (caller should abort the run), "__ERROR__" for other failures.
     """
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     body = {
@@ -191,7 +180,7 @@ def call_gemini(model, api_key, decls, intent, sleep, max_retries=4):
                     body = e.read().decode(errors="ignore")
                 except Exception:  # noqa: BLE001
                     pass
-                # "limit: 0" means the free-tier daily allowance is spent — retrying is futile.
+                # "limit: 0" means the daily allowance is spent; retrying is futile.
                 if "limit: 0" in body:
                     return "__QUOTA__", {}
                 # Per-minute throttle: honour the server's suggested "retry in Ns".
@@ -228,7 +217,7 @@ def params_match(expected, got):
             good = g is not None and (norm(exp) in norm(g) or norm(g) in norm(exp))
         elif key in ("dependsOnTitles", "dependsOnTaskIds"):
             gv = " ".join(norm(x) for x in (g or []))
-            # also accept the cross form (titles given but ids extracted, or vice versa)
+            # accept the cross form too: titles expected but ids extracted, or vice versa
             cross = " ".join(norm(x) for x in (got.get("dependsOnTaskIds", []) + got.get("dependsOnTitles", [])))
             hay = gv + " " + cross
             good = all(
@@ -248,7 +237,7 @@ def params_match(expected, got):
     return ok, detail
 
 
-# ---- OpenAI-compatible provider (GitHub Models): same dataset, different wire format ----
+# OpenAI-compatible provider (GitHub Models): same dataset, different wire format.
 
 def _lower_types(node):
     """Recursively lowercase JSON-schema 'type' values (Gemini uses UPPER, OpenAI uses lower)."""
@@ -337,7 +326,6 @@ def run_variant(variant, provider, model, creds, dataset, sleep, limit):
             else call_github(model, creds, decls, item["intent"], sleep)
         )
         if got_fn == "__QUOTA__":
-            # Stop the whole run immediately rather than grind through retries for hours.
             raise QuotaExhausted(f"quota hit at {item['id']} ({i + 1}/{len(items)}, variant={variant})")
         predicted = None if got_fn is None else got_fn
         fn_correct = (
@@ -417,7 +405,7 @@ def main():
     if args.goals:
         wanted = {g.strip() for g in args.goals.split(",") if g.strip()}
         dataset = [d for d in dataset if d["goal"] in wanted]
-    if args.per_goal:  # balanced subset: first N of each goal (keeps free-tier runs within caps)
+    if args.per_goal:  # balanced subset: first N of each goal, to stay within free-tier caps
         from collections import defaultdict
         grouped = defaultdict(list)
         for d in dataset:

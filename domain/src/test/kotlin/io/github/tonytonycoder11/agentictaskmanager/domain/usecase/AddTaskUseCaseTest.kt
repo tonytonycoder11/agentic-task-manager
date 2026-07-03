@@ -43,7 +43,7 @@ class AddTaskUseCaseTest {
         val repo = FakeTaskRepository(initialTasks = listOf(task("A", title = "Prepare slides")))
         val useCase = AddTaskUseCase(repo, SequentialIdGenerator())
 
-        // Substring, different case — should still resolve uniquely to task A.
+        // Substring match, different case — still resolves uniquely to A.
         val result = useCase(AddTaskCommand(title = "Present", dependsOnTitles = listOf("slides")))
 
         assertEquals(listOf(TaskId("A")), result.linkedPrerequisites)

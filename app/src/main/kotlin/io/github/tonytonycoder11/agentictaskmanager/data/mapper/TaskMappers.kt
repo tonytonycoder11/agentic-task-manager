@@ -11,10 +11,8 @@ import io.github.tonytonycoder11.agentictaskmanager.domain.model.TaskStatus
 import java.time.Instant
 
 /**
- * Translation between Room rows and domain models. Keeping this in one place means the rest of
- * the data layer hands the domain clean [Task]/[DependencyEdge] objects and never leaks Room
- * types upward. Enum parsing is defensive: an unrecognised stored value falls back to a safe
- * default rather than crashing.
+ * Translation between Room rows and domain models. Enum parsing is defensive: an unrecognised
+ * stored value falls back to a safe default rather than crashing.
  */
 
 fun TaskEntity.toDomain(): Task = Task(

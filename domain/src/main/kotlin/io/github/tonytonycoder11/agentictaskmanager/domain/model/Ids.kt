@@ -1,12 +1,8 @@
 package io.github.tonytonycoder11.agentictaskmanager.domain.model
 
 /**
- * Type-safe identifier for a [Task].
- *
- * Modelled as an inline value class so it costs nothing at runtime (it is just a String)
- * yet the compiler still prevents passing a raw String — or, worse, the wrong id — where a
- * [TaskId] is expected. The whole graph logic traffics in [TaskId], so this small wrapper
- * removes an entire class of "I swapped two ids" bugs.
+ * Type-safe identifier for a [Task]. Inline value class: zero runtime cost, but the compiler
+ * rejects passing a raw String or the wrong id where a [TaskId] is expected.
  */
 @JvmInline
 value class TaskId(val value: String) {

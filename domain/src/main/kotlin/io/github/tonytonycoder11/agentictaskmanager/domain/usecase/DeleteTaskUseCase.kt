@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.withLock
 
 /** Outcome of a delete request. */
 enum class DeleteOutcome {
-    /** Nothing was deleted yet — the caller must confirm first (see [DeleteTaskUseCase]). */
+    /** Nothing was deleted yet — the caller must confirm first. */
     CONFIRMATION_REQUIRED,
 
     /** The task (and its sub-task subtree) was deleted. */
@@ -25,16 +25,16 @@ data class DeleteTaskResult(
 )
 
 /**
- * Deletes a task — the project's one DESTRUCTIVE operation, so it is guarded by explicit,
- * two-step confirmation (security rule #5).
+ * Deletes a task — the project's one destructive operation, so it is guarded by two-step
+ * confirmation.
  *
- * Call it first with `confirmed = false`: nothing is deleted and the result lists exactly what
- * *would* be removed — the task plus its entire sub-task subtree (deletion cascades to children
- * so no orphaned sub-tasks are left behind). Only a second call with `confirmed = true` actually
- * deletes. Dependency edges referencing the deleted tasks are removed by the repository.
+ * Call it first with `confirmed = false`: nothing is deleted and the result lists what *would* be
+ * removed — the task plus its entire sub-task subtree (deletion cascades to children so no orphaned
+ * sub-tasks are left behind). Only a second call with `confirmed = true` deletes. Dependency edges
+ * referencing the deleted tasks are removed by the repository.
  *
- * Like the other write use cases it runs under the shared [mutationLock], so a deletion cannot
- * interleave with a concurrent add/complete and leave the graph in an inconsistent state.
+ * Runs under the shared [mutationLock], so a deletion cannot interleave with a concurrent
+ * add/complete and leave the graph inconsistent.
  */
 class DeleteTaskUseCase(
     private val repository: TaskRepository,
@@ -73,9 +73,8 @@ class DeleteTaskUseCase(
         }
 
     /**
-     * Returns [rootId] followed by every transitive sub-task (breadth-first). The order means
-     * the root comes first and deeper descendants come later, so reversing the list yields a
-     * safe leaf-to-root deletion order.
+     * Returns [rootId] followed by every transitive sub-task, breadth-first, so reversing the list
+     * yields a safe leaf-to-root deletion order.
      */
     private fun collectSubtree(rootId: TaskId, allTasks: List<Task>): List<TaskId> {
         val childrenByParent: Map<TaskId, List<Task>> = allTasks
